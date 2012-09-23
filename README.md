@@ -1,4 +1,4 @@
-bibwiki
+BibWiki
 =======
 
 Bibliography management for MediaWiki
