@@ -32,3 +32,7 @@ Usage
 -----
 After installation the extension will be available in Special Pages section of MediaWiki.
 
+Attributions
+------------
+Descriptions of BibTeX fields and entry types are from 
+Wikipedia article on [BibTeX](https://en.wikipedia.org/wiki/BibTeX).
