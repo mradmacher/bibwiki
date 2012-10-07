@@ -24,9 +24,9 @@ Configuration
 -------------
 Default settings can be changed in `LocalSettings.php`.
 Currently there are following configuration options available:
-* `$wgBibWikiTmpDir` (defaults to '/tmp') - the name of the directory that can be used for storing temporary data;
+* `$wgBibWikiTmpDir` (defaults to "/tmp") - the name of the directory that can be used for storing temporary data;
   it should be readable and writeable for the web server
-* `$wgBibWikiDBName` (defaults to 'bibwiki') - the name the database that will be used by MongoDB
+* `$wgBibWikiDBName` (defaults to "bibwiki") - the name the database that will be used by MongoDB
 
 Usage
 -----
@@ -34,5 +34,5 @@ After installation the extension will be available in Special Pages section of M
 
 Attributions
 ------------
-Descriptions of BibTeX fields and entry types are from 
+Descriptions of BibTeX fields and entry types are taken from 
 Wikipedia article on [BibTeX](https://en.wikipedia.org/wiki/BibTeX).
