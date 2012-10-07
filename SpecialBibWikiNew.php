@@ -6,14 +6,21 @@
 
   function execute( $par ) {
     global $wgRequest, $wgOut;
+    parent::execute( $par );
+
     $obj = array();
 
-    $this -> setHeaders();
     $wgOut -> addHtml( $this -> linkToIndex() );
     if( $wgRequest -> wasPosted() ) {
       $obj = $this -> parseFields( $wgRequest );
-      $this -> save( $obj );
-      $wgOut -> addWikiText( 'Publication successfuly saved.' );
+      $key = $this -> genBibkey( $obj );
+      $obj[ $this -> bibkeyField ] = $key;
+      if( $this -> isUnique( $key ) ) {
+        $this -> save( $obj );
+        $wgOut -> addWikiText( 'Publication successfuly saved.' );
+      } else {
+        $wgOut -> addWikiText( 'Publication already exists.' );
+      }
     } else {
       $pub_type = $wgRequest -> getText( 'pub_entry_type' );
       if( $pub_type != '' ) {

@@ -6,10 +6,10 @@
 
   function execute( $par ) {
     global $wgRequest, $wgOut;
+    parent::execute( $par );
 
-    $this -> setHeaders();
+    $wgOut -> addHtml( $this -> linkToImport() );
     $wgOut -> addHtml( $this -> linkToNew() );
-  
     $wgOut -> addHtml( $this -> getSearchForm() );
 
     $criteria = array();

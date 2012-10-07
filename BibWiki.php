@@ -39,4 +39,7 @@ $wgSpecialPageGroups[ 'BibWiki' ] = 'bibwiki';
 $wgSpecialPageGroups[ 'BibWikiImport' ] = 'bibwiki';
 $wgSpecialPageGroups[ 'BibWikiIndex' ] = 'bibwiki';
 $wgSpecialPageGroups[ 'BibWikiNew' ] = 'bibwiki';
+
+$wgBibWikiTmpDir = '/tmp';
+$wgBibWikiDBName = 'bibwiki';
 ?>

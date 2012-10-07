@@ -6,6 +6,8 @@
 
   function execute( $par ) {
     global $wgRequest, $wgOut;
+    parent::execute( $par );
+
     $pub_id = $wgRequest -> getText( 'pub_id' );
     if( $pub_id != '' ) {
       $obj = $this -> findById( $pub_id );
@@ -13,7 +15,6 @@
       $obj = array();
     }
 
-    $this -> setHeaders();
     $wgOut -> addHtml( $this -> linkToIndex() );
     if( $wgRequest -> wasPosted() ) {
       $this -> removeById( $pub_id );

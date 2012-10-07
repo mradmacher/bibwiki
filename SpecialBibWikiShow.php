@@ -6,7 +6,7 @@
 
   function execute( $par ) {
     global $wgRequest, $wgOut;
-    $this -> setHeaders();
+    parent::execute( $par );
   
     $pub_id = $wgRequest -> getText( 'pub_id' );
     if( $pub_id != '' ) {

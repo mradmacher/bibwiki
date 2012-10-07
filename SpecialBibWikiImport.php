@@ -5,32 +5,45 @@
   }
 
   function execute( $par ) {
-    global $wgRequest, $wgOut;
+    global $wgRequest, $wgOut, $wgBibWikiTmpDir;
+    parent::execute( $par );
 
-    $this -> setHeaders();
-    $this -> linkToIndex();
+    $curdir = dirname( __FILE__ );
+    //$upldir = '/tmp';
+
+    $wgOut -> addHtml( $this -> linkToIndex() );
     if( $wgRequest -> wasPosted() ) {
-      $file = $_FILES['pub_file']['tmp_name'];
-      if( is_uploaded_file( $file ) ) {
-        $wgOut -> addWikiText( 'Successfuly uploaded' );
-        $result = array();
-        exec( 'bib2x -f ' . $file . ' -t import.template', $result );
-        foreach( $result as $line ) {
-          if( $line != '' ) {
-            $pub = json_decode( $line, true ); 
-            $type = str_replace( '@', '', $pub['entry_type'] );
-            $pub[ $this -> typeField ] = $type;
+      $wgOut -> addHtml( $this -> linkToImport() );
+      $file = tempnam( $wgBibWikiTmpDir, 'bib' );
+      $fh = fopen( $file, 'w' ) or die( "can't open file" );
+      fwrite( $fh, $wgRequest -> getVal( 'pub_bib' ) );
+      fclose( $fh );
+      $result = array();
+      $wgOut -> addWikiText( exec( 'bib2x -f ' . $file . ' -t ' . $curdir . '/import.template', $result ) );
+      $publications = array();
+      $duplicates_count = 0;
+      foreach( $result as $line ) {
+        if( $line != '' ) {
+          $pub = json_decode( $line, true ); 
+          $type = str_replace( '@', '', $pub['entry_type'] );
+          $pub[ $this -> typeField ] = $type;
+          $key = $this -> genBibkey( $pub );
+          $pub[ $this -> bibkeyField ] = $key;
+          if( $this -> isUnique( $key ) ) {
             array_push( $publications, $pub );
+          } else {
+            $duplicates_count += 1;
           }
         }
-        $this -> import( $publications );
-        $wgOut -> addWikiText( 'Successfuly imported' );
       }
+      $this -> import( $publications );
+      $wgOut -> addWikiText( 'Imported: ' . count($publications) );
+      $wgOut -> addWikiText( 'Already existing: ' . $duplicates_count );
     } else {
       $html = '';
-      $html .= '<form action="' . $this -> bibWikiImportURL . '" method="post" enctype="multipart/form-data">';
-      $html .= '<label for="pub_file">File to import</label><br />';
-      $html .= '<input name="pub_file" type="file"/><br />' ;
+      $html .= '<form action="' . $this -> bibWikiImportURL . '" method="post">';
+      $html .= '<label for="pub_bib">BibTeX</label><br />';
+      $html .= '<textarea rows="30" cols="80" name="pub_bib"></textarea><br />' ;
       $html .= '<input type="submit" value="Import" />'; 
       $html .= '</form>';
       $wgOut -> addHtml( $html );

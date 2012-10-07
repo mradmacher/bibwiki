@@ -7,6 +7,7 @@
   protected $bibWikiImportURL = '/wiki/Special:BibWikiImport';
   protected $idField = '_id';
   protected $typeField = 'entry_type';
+  protected $bibkeyField = 'bibkey';
 
   protected $bibFields = array( 'address', 'annote', 'author', 'booktitle', 'chapter', 'crossref',
       'edition', 'editor', 'eprint', 'howpublished', 'institution', 'journal', 'key',
@@ -155,19 +156,20 @@
 
 
   protected function getConnection() {
+    global $wgBibWikiDBName;
     if( $this -> dbConnection == NULL ) {
       $this -> dbConnection = new Mongo();
     }
-    return $this -> dbConnection;
+    return $this -> dbConnection -> selectDB( $wgBibWikiDBName );
   }
 
   protected function findById( $id ) {
-    $obj = $this -> getConnection() -> eforams -> publications -> findOne( array(  $this -> idField  => new MongoId( $id ) ) );
+    $obj = $this -> getConnection() -> publications -> findOne( array(  $this -> idField  => new MongoId( $id ) ) );
     return $obj;
   }
 
   protected function removeById( $id ) {
-    $this -> getConnection() -> eforams -> publications -> remove( array( $this -> idField => new MongoId( $id ) )  ); 
+    $this -> getConnection() -> publications -> remove( array( $this -> idField => new MongoId( $id ) )  ); 
   }
 
   protected function find( $criteria ) {
@@ -177,7 +179,16 @@
         $conditions[$key] = new MongoRegex( '/' . $value . '/i' );
       }
     }
-    return $this -> getConnection() -> eforams -> publications -> find( $conditions );
+    return $this -> getConnection() -> publications -> find( $conditions );
+  }
+
+  protected function isUnique( $bibkey, $excludeid = NULL ) {
+    if( $excludeid == NULL ) {
+      return sizeof( $this -> getConnection() -> publications -> findOne( array( $this -> bibkeyField => $bibkey ) ) ) == 0;
+    } else {
+      return sizeof( $this -> getConnection() -> publications -> findOne(
+        array( $this -> bibkeyField => $bibkey, $this -> idField => array( '$ne' => new MongoId( $excludeid ) ) ) ) ) == 0;
+    }
   }
 
   protected function save( $obj ) {
@@ -187,11 +198,13 @@
     } else {
       unset( $obj[ $this -> idField ] );
     }
-    $this -> getConnection() -> eforams -> publications -> save( $obj );
+    $this -> getConnection() -> publications -> save( $obj );
   }
 
   protected function import( $collection ) {
-    $this -> getConnection() -> eforams -> publications -> batchInsert( $collection );
+    if( count($collection) > 0 ) {
+      $this -> getConnection() -> publications -> batchInsert( $collection );
+    }
   }
 
   protected function linkToShow( $id ) {
@@ -217,7 +230,16 @@
     return '<a href="' . $this -> bibWikiDeleteURL . '?pub_id=' . $id . '">Delete</a>&nbsp;'; 
   }
 
+  protected function linkToImport() {
+    return '<a href="' . $this -> bibWikiImportURL . '">Import</a>&nbsp;';
+  }
+
   function execute( $par ) {
+    global $wgRequest, $wgOut, $wgUser;
+    $this -> setHeaders();
+    if( !$wgUser -> isLoggedIn() ) {
+      $this -> displayRestrictionError();
+    }
   }
 
   function getSearchForm() {
@@ -244,8 +266,14 @@
 
   function getShowHtml( $obj ) {
     $html = '';
+    $html .= '<br />';
+    $html .= '<b>' . ucfirst( $obj[ $this -> typeField ] ) . '</b>';
+    $html .= '<br />';
+    $html .= '<small>' . $obj[ $this -> bibkeyField ] . '</small>';
     $html .= '<dl>';
     $type = $obj[ $this -> typeField ];
+    //$html .= '<dt>Entry type</td><dd>' . $obj[ $this -> typeField ] . '</dd>';
+    //$html .= '<dt>Bibkey</td><dd>' . $obj[ $this -> bibkeyField ] . '</dd>';
     foreach( array( 'required', 'optional' ) as $fieldRequirement ) {
       foreach( $this -> bibEntryTypeFields[ $type ][ $fieldRequirement ] as $bibField ) {
         $value = $obj[ $bibField ];
@@ -254,7 +282,6 @@
         }
       }
     }
-
     return $html;
   }
 
@@ -304,7 +331,7 @@
 
   function parseFields( $request ) {
     $obj = array();
-    $obj[ $this -> typeField ] = $request -> getVal( 'pub_entry_type' );
+    $obj[ $this -> typeField ] = $request -> getVal( 'pub_' . $this -> typeField );
     $obj[ $this -> idField ] = $request -> getVal( 'pub_id' );
 
     foreach( $this -> bibFields as $field ) {
@@ -316,5 +343,45 @@
     return $obj;
   }
 
+  protected function genTitleHash( $title ) {
+    preg_match_all( '/(\w)\w+/', $title, $matches );
+    return strtolower( join( $matches[1], '' ) );
+  }
+
+  protected function genYearHash( $year ) {
+    $prefix = '';
+    for( $i = 1; $i <= 4-strlen( $year ); $i++ ) {
+      $prefix .= '.';
+    }
+    return $prefix . $year;
+  }
+
+  protected function genAuthorHash( $author ) {
+    $test = preg_replace( '/ and.*$/', '', $author );
+
+    $name = NULL;
+    preg_match( '/(\w+)}/U', $test, $matches );
+    if( count($matches) > 0 ) {
+      $name = $matches[1];
+    }
+    if( $name == NULL ) {
+      preg_match( '/(\w+),/U', $test, $matches );
+      if( count($matches) > 0 ) {
+        $name = $matches[1];
+      }
+      if( $name == NULL ) {
+        preg_match( '/(\w+)$/', $test, $matches );
+        if( count($matches) > 0 ) {
+          $name = $matches[1];
+        }
+      }
+    }
+    return strtolower( $name );
+  }
+
+  protected function genBibkey( $obj ) {
+    return $this -> genAuthorHash( $obj[ 'author' ] ) . $this -> genYearHash( $obj[ 'year' ] ) . $this -> genTitleHash( $obj[ 'title' ] );
+  }
+  
 }
 ?>
