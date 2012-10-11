@@ -9,12 +9,12 @@ This extension requires the following software to be installed:
 * [Bib2x](http://www.xandi.eu/bib2x/documentation.html)
 * [MongoDB](http://www.mongodb.org)
 
-Instalation
+Installation
 -----------
 Put the code to MediaWiki extensions directory under BibWiki name.
 Using git it can be done with command:
 
-    git clone https://github.com/mradmacher/bibwiki
+    git clone https://github.com/mradmacher/bibwiki.git
 
 In your `LocalSettings.php` add the following line:
 
