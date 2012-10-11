@@ -150,7 +150,7 @@
         )
     );
 
-  protected $bibSearcheableFields = array( 'author', 'title', 'year' );
+  protected $searcheableFields = array( 'author', 'title', 'publisher', 'journal', 'year' );
 
   function __construct( $name ) {
     parent::__construct( $name );
@@ -229,9 +229,11 @@
 
   protected function getCSS() {
     $css = '';
+    $css .= 'form.bibwiki-search {display: inline; margin-right: 5px;}';
+    $css .= '.bibwiki-search input[type=submit]{width: 62px;}';
     $css .= '.bibwiki-search label {display: inline-table; width: 70px; text-align: right; margin-right: 5px;}';
+    $css .= '.bibwiki-search input {margin-bottom: 1px;}';
     $css .= '.bibwiki-search label:after {content: ":";}';
-    $css .= '.bibwiki-search input[type=submit] {display: block;}';
     $css .= '.bibwiki-link {margin-right: 5px;}';
     $css .= '.bibwiki-table {border-collapse: collapse; border 1px solid}';
     $css .= '.bibwiki-table td {padding-right: 5px; text-align: left; vertical-align: top;}';
@@ -247,20 +249,18 @@
     $wgOut -> addInlineStyle( $this -> getCSS() );
   }
 
-  function getSearchForm() {
-    $html = '';
+  function getSearchForm( $criteria ) {
+    $html = '<br />';
     $html .= '<form class="bibwiki-search" action="' . $this -> indexURL . '" method="get">';
-    $html .= '<label for="pub_title">Title</label>';
-    $html .= '<input name="pub_title" type="text" size="50"></input><br />';
-    $html .= '<label for="pub_author">Author</label>';
-    $html .= '<input name="pub_author" type="text" size="50"></input><br />';
-    $html .= '<label for="pub_publisher">Publisher</label>';
-    $html .= '<input name="pub_publisher" type="text" size="50"></input><br />';
-    $html .= '<label for="pub_journal">Journal</label>';
-    $html .= '<input name="pub_journal" type="text" size="50"></input><br />';
-    $html .= '<label for="pub_year">Year</label>';
-    $html .= '<input name="pub_year" type="text" size="4"></input><br />';
+    foreach( $this -> searcheableFields as $field ) {
+      $html .= '<label for="' . $this -> toParamName( $field ) . '">' . ucfirst($this -> bibFieldNames[$field]) . '</label>';
+      $html .= '<input name="' . $this -> toParamName( $field ) . '" type="text" size="40" ';
+      $html .= 'value="' . $criteria[ $field ] . '" /><br />';
+    }
     $html .= '<input type="submit" value="Search" />';
+    $html .= '</form>';
+    $html .= '<form class="bibwiki-search" action="' . $this -> indexURL . '" method="get">';
+    $html .= '<input type="submit" value="Reset" />';
     $html .= '</form>';
     return $html;
   }
@@ -323,21 +323,7 @@
   }
 
   function getIndexHtml( $collection ) {
-    $html = '';
-    /*
-    $html .= '<ul>';
-    foreach( $collection as $obj ) {
-      $html .= '<li>' . $this -> linkToId( 'Show', $this -> showURL, $obj[ $this -> idField ] ) . 
-        $this -> linkToId( 'Modify', $this -> modifyURL, $obj[ $this -> idField ] ) . 
-        $this -> linkToId( 'Delete', $this -> deleteURL, $obj[ $this -> idField ] ) . '<br />';
-      $html .= $obj['title'] . '<br />';
-      $html .= $obj['author'] . '<br />';
-      $html .= $obj['year'] . '<br />';
-      $html .= '</li>';
-    }
-    $html .= '</ul>';
-    */
-    $html .= '<table class="bibwiki-table">';
+    $html = '<table class="bibwiki-table">';
     $html .= '<tr>';
     $html .= '<th>' . ucfirst( $this -> bibFieldNames[ 'year' ] ) . '</th>';
     $html .= '<th>' . ucfirst( $this -> bibFieldNames[ 'title' ] ) . '</th>';
