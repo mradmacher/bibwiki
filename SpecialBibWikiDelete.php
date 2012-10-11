@@ -8,14 +8,14 @@
     global $wgRequest, $wgOut;
     parent::execute( $par );
 
-    $pub_id = $wgRequest -> getText( 'pub_id' );
+    $pub_id = $wgRequest -> getText( $this -> toParamName( $this -> idField ) );
     if( $pub_id != '' ) {
       $obj = $this -> findById( $pub_id );
     } else {
       $obj = array();
     }
 
-    $wgOut -> addHtml( $this -> linkToIndex() );
+    $wgOut -> addHtml( $this -> linkTo( 'Index', $this -> indexURL ) );
     if( $wgRequest -> wasPosted() ) {
       $this -> removeById( $pub_id );
       $wgOut -> addWikiText( "Publication successfuly deleted." );

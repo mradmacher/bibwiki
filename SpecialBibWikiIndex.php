@@ -8,8 +8,8 @@
     global $wgRequest, $wgOut;
     parent::execute( $par );
 
-    $wgOut -> addHtml( $this -> linkToImport() );
-    $wgOut -> addHtml( $this -> linkToNew() );
+    $wgOut -> addHtml( $this -> linkTo( 'Import', $this -> importURL ) );
+    $wgOut -> addHtml( $this -> linkTo( 'New', $this -> newURL ) );
     $wgOut -> addHtml( $this -> getSearchForm() );
 
     $criteria = array();

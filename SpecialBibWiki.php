@@ -1,11 +1,13 @@
 <?php class SpecialBibWiki extends SpecialPage {
-  protected $bibWikiIndexURL = '/wiki/Special:BibWikiIndex';
-  protected $bibWikiShowURL = '/wiki/Special:BibWikiShow';
-  protected $bibWikiModifyURL = '/wiki/Special:BibWikiModify';
-  protected $bibWikiNewURL = '/wiki/Special:BibWikiNew';
-  protected $bibWikiDeleteURL = '/wiki/Special:BibWikiDelete';
-  protected $bibWikiImportURL = '/wiki/Special:BibWikiImport';
+  protected $indexURL = '/wiki/Special:BibWikiIndex';
+  protected $showURL = '/wiki/Special:BibWikiShow';
+  protected $modifyURL = '/wiki/Special:BibWikiModify';
+  protected $newURL = '/wiki/Special:BibWikiNew';
+  protected $deleteURL = '/wiki/Special:BibWikiDelete';
+  protected $importURL = '/wiki/Special:BibWikiImport';
+
   protected $idField = '_id';
+  protected $paramPrefix = 'pub_';
   protected $typeField = 'entry_type';
   protected $bibkeyField = 'bibkey';
 
@@ -206,32 +208,34 @@
       $this -> getConnection() -> publications -> batchInsert( $collection );
     }
   }
-
-  protected function linkToShow( $id ) {
-    return '<a href="' . $this -> bibWikiShowURL . '?pub_id=' . $id . '">Show</a>&nbsp;';
+  protected function toParamName( $key ) {
+    return $this -> paramPrefix . $key;
   }
 
-  protected function linkToModify( $id ) {
-    return '<a href="' . $this -> bibWikiModifyURL . '?pub_id=' . $id . '">Modify</a>&nbsp;'; 
+  protected function linkTo( $title, $url, $params = array() ) {
+    $parary = array();
+    $parurl = $url;
+    foreach( $params as $key => $value ) {
+      array_push( $parary, $this -> paramPrefix . $key . '=' . $value );
+    }
+    if( count( $parary ) > 0 ) {
+      $parurl .= '?' . join( $parary, '&' );
+    }
+    return '<a class="bibwiki-link" href="' . $parurl . '">' . $title . '</a>';
+  }
+  protected function linkToId( $title, $url, $id ) {
+    return $this -> linkTo( $title, $url, array( $this -> idField => $id ) );
   }
 
-  protected function linkToNew() {
-    return '<a href="' . $this -> bibWikiNewURL . '">New</a>&nbsp;';
-  }
-  protected function linkToNewType( $type, $title ) {
-    return '<a href="' . $this -> bibWikiNewURL . '?pub_entry_type=' . $type . '">' . $title . '</a>';
-  }
-
-  protected function linkToIndex() {
-    return '<a href="' . $this -> bibWikiIndexURL . '">Index</a>&nbsp;';
-  }
-
-  protected function linkToDelete( $id ) {
-    return '<a href="' . $this -> bibWikiDeleteURL . '?pub_id=' . $id . '">Delete</a>&nbsp;'; 
-  }
-
-  protected function linkToImport() {
-    return '<a href="' . $this -> bibWikiImportURL . '">Import</a>&nbsp;';
+  protected function getCSS() {
+    $css = '';
+    $css .= '.bibwiki-search label {display: inline-table; width: 70px; text-align: right; margin-right: 5px;}';
+    $css .= '.bibwiki-search label:after {content: ":";}';
+    $css .= '.bibwiki-search input[type=submit] {display: block;}';
+    $css .= '.bibwiki-link {margin-right: 5px;}';
+    $css .= '.bibwiki-table {border-collapse: collapse; border 1px solid}';
+    $css .= '.bibwiki-table td {padding-right: 5px; text-align: left; vertical-align: top;}';
+    return $css;
   }
 
   function execute( $par ) {
@@ -240,24 +244,29 @@
     if( !$wgUser -> isLoggedIn() ) {
       $this -> displayRestrictionError();
     }
+    $wgOut -> addInlineStyle( $this -> getCSS() );
   }
 
   function getSearchForm() {
     $html = '';
-    $html .= '<form action="' . $this -> bibWikiIndexURL . '" method="get">';
-    $html .= '<label for="pub_title">Title</label><br />';
-    $html .= '<input name="pub_title" type="text"></input><br />';
-    $html .= '<label for="pub_author">Author</label><br />';
-    $html .= '<input name="pub_author" type="text"></input><br />';
-    $html .= '<label for="pub_year">Year</label><br />';
-    $html .= '<input name="pub_year" type="text"></input><br />';
+    $html .= '<form class="bibwiki-search" action="' . $this -> indexURL . '" method="get">';
+    $html .= '<label for="pub_title">Title</label>';
+    $html .= '<input name="pub_title" type="text" size="50"></input><br />';
+    $html .= '<label for="pub_author">Author</label>';
+    $html .= '<input name="pub_author" type="text" size="50"></input><br />';
+    $html .= '<label for="pub_publisher">Publisher</label>';
+    $html .= '<input name="pub_publisher" type="text" size="50"></input><br />';
+    $html .= '<label for="pub_journal">Journal</label>';
+    $html .= '<input name="pub_journal" type="text" size="50"></input><br />';
+    $html .= '<label for="pub_year">Year</label>';
+    $html .= '<input name="pub_year" type="text" size="4"></input><br />';
     $html .= '<input type="submit" value="Search" />';
     $html .= '</form>';
     return $html;
   }
 
   function getDestroyForm( $obj ) {
-    $html = '<form action="' . $this -> bibWikiDeleteURL . '" method="post">';
+    $html = '<form class="bibwiki-form" action="' . $this -> deleteURL . '" method="post">';
     $html .= '<input name="pub_id" type="hidden" value="' . $obj[ $this -> idField ] . '"></input>';
     $html .= '<input type="submit" value="Delete" />';
     $html .= '</form>';
@@ -315,27 +324,50 @@
 
   function getIndexHtml( $collection ) {
     $html = '';
+    /*
     $html .= '<ul>';
     foreach( $collection as $obj ) {
-      $html .= '<li>' . $this -> linkToShow( $obj[ $this -> idField ] ) . 
-        $this -> linkToModify( $obj[ $this -> idField ] ) . 
-        $this -> linkToDelete( $obj[ $this -> idField ] ) . '<br />';
+      $html .= '<li>' . $this -> linkToId( 'Show', $this -> showURL, $obj[ $this -> idField ] ) . 
+        $this -> linkToId( 'Modify', $this -> modifyURL, $obj[ $this -> idField ] ) . 
+        $this -> linkToId( 'Delete', $this -> deleteURL, $obj[ $this -> idField ] ) . '<br />';
       $html .= $obj['title'] . '<br />';
       $html .= $obj['author'] . '<br />';
       $html .= $obj['year'] . '<br />';
       $html .= '</li>';
     }
     $html .= '</ul>';
+    */
+    $html .= '<table class="bibwiki-table">';
+    $html .= '<tr>';
+    $html .= '<th>' . ucfirst( $this -> bibFieldNames[ 'year' ] ) . '</th>';
+    $html .= '<th>' . ucfirst( $this -> bibFieldNames[ 'title' ] ) . '</th>';
+    $html .= '<th>' . ucfirst( $this -> bibFieldNames[ 'author' ] ) . '</th>';
+    $html .= '<th>' . ucfirst( $this -> bibFieldNames[ 'publisher' ] ) . '</th>';
+    $html .= '<th>' . ucfirst( $this -> bibFieldNames[ 'journal' ] ) . '</th>';
+    $html .= '</tr>';
+    foreach( $collection as $obj ) {
+      $html .= '<tr>';
+      $html .= '<td>' . $obj['year'] . '</td>';
+      $html .= '<td>' . $obj['title'] . '</td>';
+      $html .= '<td>' . $obj['author'] . '</td>';
+      $html .= '<td>' . $obj['publisher'] . '</td>';
+      $html .= '<td>' . $obj['journal'] . '</td>';
+      $html .= '</tr>';
+      $html .= '<tr><td colspan="3">' . $this -> linkToId( 'Show', $this -> showURL, $obj[ $this -> idField ] ) .
+        $this -> linkToId( 'Modify', $this -> modifyURL, $obj[ $this -> idField ] ) .
+        $this -> linkToId( 'Delete', $this -> deleteURL, $obj[ $this -> idField ] ) . '</td></tr>';
+    }
+    $html .= '</table>';
     return $html;
   }
 
   function parseFields( $request ) {
     $obj = array();
-    $obj[ $this -> typeField ] = $request -> getVal( 'pub_' . $this -> typeField );
-    $obj[ $this -> idField ] = $request -> getVal( 'pub_id' );
+    $obj[ $this -> typeField ] = $request -> getVal( $this -> toParamName( $this -> typeField ) );
+    $obj[ $this -> idField ] = $request -> getVal( $this -> toParamName( $this -> idField ) );
 
     foreach( $this -> bibFields as $field ) {
-      $value = $request -> getVal( 'pub_' . $field );
+      $value = $request -> getVal( $this -> toParamName( $field ) );
       if( $value != '' ) {
         $obj[$field] = $value;
       }

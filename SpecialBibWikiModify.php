@@ -8,11 +8,11 @@
     global $wgRequest, $wgOut;
     parent::execute( $par );
 
-    $pub_id = $wgRequest -> getText( 'pub_id' );
+    $pub_id = $wgRequest -> getText( $this -> toParamName( $this -> idField ) );
     $obj = $this -> findById( $pub_id );
 
-    $wgOut -> addHtml( $this -> linkToIndex() );
-    $wgOut -> addHtml( $this -> linkToShow( $obj[ $this -> idField ] ) );
+    $wgOut -> addHtml( $this -> linkTo( 'Index', $this -> indexURL ) );
+    $wgOut -> addHtml( $this -> linkToId( 'Show', $this -> showURL, $obj[ $this -> idField ] ) );
 
     if( $wgRequest -> wasPosted() ) {
       $obj = $this -> parseFields( $wgRequest );

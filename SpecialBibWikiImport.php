@@ -11,9 +11,9 @@
     $curdir = dirname( __FILE__ );
     //$upldir = '/tmp';
 
-    $wgOut -> addHtml( $this -> linkToIndex() );
+    $wgOut -> addHtml( $this -> linkTo( 'Index', $this -> indexURL ) );
     if( $wgRequest -> wasPosted() ) {
-      $wgOut -> addHtml( $this -> linkToImport() );
+      $wgOut -> addHtml( $this -> linkTo( 'Import', $this -> importURL ) );
       $file = tempnam( $wgBibWikiTmpDir, 'bib' );
       $fh = fopen( $file, 'w' ) or die( "can't open file" );
       fwrite( $fh, $wgRequest -> getVal( 'pub_bib' ) );
