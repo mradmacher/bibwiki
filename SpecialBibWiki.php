@@ -58,7 +58,7 @@
     'howpublished' => 'How it was published, if the publishing method is nonstandard',
     'institution' => 'The institution that was involved in the publishing, but not necessarily the publisher',
     'journal' => 'The journal or magazine the work was published in',
-    'key' => 'A hidden field used for specifying or overriding the alphabetical order of entries (when the "author" and "editor" fields are missing). Note that this is very different from the key (mentioned just after this list) that is used to cite or cross-reference the entry.',
+    'key' => 'A hidden field used for specifying or overriding the alphabetical order of entries (when the "author" and "editor" fields are missing). Note that this is very different from the key that is used to cite or cross-reference the entry.',
     'month' => 'The month of publication (or, if unpublished, the month of creation)',
     'note' => 'Miscellaneous extra information',
     'number' => 'The "(issue) number" of a journal, magazine, or tech-report, if applicable. (Most publications have a "volume", but no "number" field.)',
@@ -150,6 +150,34 @@
         'optional' => array( 'editor', /*'volume/number'*/'volume', 'number', 'series', 'pages', 'address', 'month', 'organization', 'publisher', 'note', 'key' ) 
         )
     );
+
+  protected $fieldOptions = array(
+      'address' => array( 'type' => 'string', 'size' => 80 ),
+      'annote' => array( 'type' => 'text', 'cols' => 60, 'rows' => 20 ),
+      'author' => array( 'type' => 'string', 'size' => 80 ),
+      'booktitle' => array( 'type' => 'string', 'size' => 80 ),
+      'chapter' => array( 'type' => 'string', 'size' => 80 ),
+      'crossref' => array( 'type' => 'string', 'size' => 80 ),
+      'edition' => array( 'type' => 'string', 'size' => 80 ),
+      'editor' => array( 'type' => 'string', 'size' => 80 ),
+      'eprint' => array( 'type' => 'string', 'size' => 80 ),
+      'howpublished' => array( 'type' => 'string', 'size' => 80 ),
+      'institution' => array( 'type' => 'string', 'size' => 80 ),
+      'journal' => array( 'type' => 'string', 'size' => 80 ),
+      'key' => array( 'type' => 'string', 'size' => 10 ),
+      'month' => array( 'type' => 'string', 'size' => 10 ),
+      'note' => array( 'type' => 'text', 'cols' => 60, 'rows' => 20 ),
+      'number' => array( 'type' => 'string', 'size' => 20 ),
+      'organization' => array( 'type' => 'string', 'size' => 80 ),
+      'pages' => array( 'type' => 'string', 'size' => 10 ),
+      'publisher' => array( 'type' => 'string', 'size' => 80 ),
+      'school' => array( 'type' => 'string', 'size' => 80 ),
+      'series' => array( 'type' => 'string', 'size' => 80 ),
+      'title' => array( 'type' => 'string', 'size' => 80 ),
+      'type' => array( 'type' => 'string', 'size' => 40 ),
+      'url' => array( 'type' => 'string', 'size' => 80 ),
+      'volume' => array( 'type' => 'string', 'size' => 20 ),
+      'year' => array( 'type' => 'string', 'size' => 4 ) );
 
   protected $searcheableFields = array( 'author', 'title', 'publisher', 'journal', 'year' );
 
@@ -291,8 +319,6 @@
     $html .= '<small>' . $obj[ $this -> bibkeyField ] . '</small>';
     $html .= '<dl>';
     $type = $obj[ $this -> typeField ];
-    //$html .= '<dt>Entry type</td><dd>' . $obj[ $this -> typeField ] . '</dd>';
-    //$html .= '<dt>Bibkey</td><dd>' . $obj[ $this -> bibkeyField ] . '</dd>';
     foreach( array( 'required', 'optional' ) as $fieldRequirement ) {
       foreach( $this -> bibEntryTypeFields[ $type ][ $fieldRequirement ] as $bibField ) {
         $value = $obj[ $bibField ];
@@ -315,7 +341,17 @@
       foreach( $this -> bibEntryTypeFields[ $type ][ $fieldRequirement ] as $bibField ) {
         $html .= '<label for="pub_' . $bibField . '">' . ucfirst( $this -> bibFieldNames[ $bibField ] ) . '</label><br />' ;
         $html .= '<small>' . $this -> bibFieldDescs[ $bibField ] . '</small><br />';
-        $html .= '<input name="pub_' . $bibField . '" type="text" value="' . $obj[ $bibField ] . '" size="70"></input><br /><br />' ;
+        switch( $this -> fieldOptions[ $bibField ][ 'type' ] ) {
+          case 'string':
+            $html .= '<input name="pub_' . $bibField . '" type="text" value="' . $obj[ $bibField ] .
+              '" size="' . $this -> fieldOptions[ $bibField ][ 'size' ] . '"></input><br /><br />' ;
+            break;
+          case 'text':
+            $html .= '<textarea name="pub_' . $bibField . '" cols="' . $this -> fieldOptions[ $bibField ][ 'cols' ] . '"' .
+              ' rows="' . $this -> fieldOptions[ $bibField ][ 'rows' ] . '">' . $obj[ $bibField ] . '</textarea><br /><br />' ;
+            break;
+        }
+        //$html .= '<input name="pub_' . $bibField . '" type="text" value="' . $obj[ $bibField ] . '" size="70"></input><br /><br />' ;
       }
       $html .= '</fieldset>';
     }
