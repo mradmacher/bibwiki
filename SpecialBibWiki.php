@@ -8,6 +8,7 @@
 
   protected $idField = '_id';
   protected $paramPrefix = 'pub_';
+  protected $paramSortPrefix = 'pubsort_';
   protected $typeField = 'entry_type';
   protected $bibkeyField = 'bibkey';
 
@@ -211,12 +212,21 @@
   protected function toParamName( $key ) {
     return $this -> paramPrefix . $key;
   }
+  protected function toParamSortName( $key ) {
+    return $this -> paramSortPrefix . $key;
+  }
 
-  protected function linkTo( $title, $url, $params = array() ) {
+  protected function linkTo( $title, $url, $params = array(), $order = array(), $others = array() ) {
     $parary = array();
     $parurl = $url;
     foreach( $params as $key => $value ) {
       array_push( $parary, $this -> paramPrefix . $key . '=' . $value );
+    }
+    foreach( $order as $key => $value ) {
+      array_push( $parary, $this -> paramSortPrefix . $key . '=' . $value );
+    }
+    foreach( $others as $key => $value ) {
+      array_push( $parary, $key . '=' . $value );
     }
     if( count( $parary ) > 0 ) {
       $parurl .= '?' . join( $parary, '&' );
@@ -249,7 +259,7 @@
     $wgOut -> addInlineStyle( $this -> getCSS() );
   }
 
-  function getSearchForm( $criteria ) {
+  function getSearchForm( $criteria, $order ) {
     $html = '<br />';
     $html .= '<form class="bibwiki-search" action="' . $this -> indexURL . '" method="get">';
     foreach( $this -> searcheableFields as $field ) {
@@ -322,15 +332,19 @@
     return $this -> getEditHtml( $obj, $type );
   }
 
-  function getIndexHtml( $collection ) {
+  function getPrintableIndexHtml( $collection ) {
     $html = '<table class="bibwiki-table">';
-    $html .= '<tr>';
-    $html .= '<th>' . ucfirst( $this -> bibFieldNames[ 'year' ] ) . '</th>';
-    $html .= '<th>' . ucfirst( $this -> bibFieldNames[ 'title' ] ) . '</th>';
-    $html .= '<th>' . ucfirst( $this -> bibFieldNames[ 'author' ] ) . '</th>';
-    $html .= '<th>' . ucfirst( $this -> bibFieldNames[ 'publisher' ] ) . '</th>';
-    $html .= '<th>' . ucfirst( $this -> bibFieldNames[ 'journal' ] ) . '</th>';
-    $html .= '</tr>';
+    $html .= '<tr><th>';
+    $html .= ucfirst( $this -> bibFieldNames[ 'year' ] );
+    $html .= '</th><th>';
+    $html .= ucfirst( $this -> bibFieldNames[ 'title' ] );
+    $html .= '</th><th>';
+    $html .= ucfirst( $this -> bibFieldNames[ 'author' ] );
+    $html .= '</th><th>';
+    $html .= ucfirst( $this -> bibFieldNames[ 'publisher' ] );
+    $html .= '</th><th>';
+    $html .= ucfirst( $this -> bibFieldNames[ 'journal' ] );
+    $html .= '</th></tr>';
     foreach( $collection as $obj ) {
       $html .= '<tr>';
       $html .= '<td>' . $obj['year'] . '</td>';
@@ -339,9 +353,38 @@
       $html .= '<td>' . $obj['publisher'] . '</td>';
       $html .= '<td>' . $obj['journal'] . '</td>';
       $html .= '</tr>';
-      $html .= '<tr><td colspan="3">' . $this -> linkToId( 'Show', $this -> showURL, $obj[ $this -> idField ] ) .
-        $this -> linkToId( 'Modify', $this -> modifyURL, $obj[ $this -> idField ] ) .
-        $this -> linkToId( 'Delete', $this -> deleteURL, $obj[ $this -> idField ] ) . '</td></tr>';
+    }
+    $html .= '</table>';
+    return $html;
+  }
+
+  function getIndexHtml( $collection, $criteria, $order ) {
+    $html = '<table class="bibwiki-table">';
+    $html .= '<tr><th></th><th>';
+    $html .= $this -> linkTo( ucfirst( $this -> bibFieldNames[ 'year' ] ), $this -> indexURL, $criteria,
+      array( 'year' => -$this -> nvl( $order, 'year', -1 ) ) );
+    $html .= '</th><th>';
+    $html .= $this -> linkTo( ucfirst( $this -> bibFieldNames[ 'title' ] ), $this -> indexURL, $criteria,
+      array( 'title' => -$this -> nvl( $order, 'title', -1 ) ) );
+    $html .= '</th><th>';
+    $html .= $this -> linkTo( ucfirst( $this -> bibFieldNames[ 'author' ] ), $this -> indexURL, $criteria,
+      array( 'author' => -$this -> nvl( $order, 'author', -1 ) ) );
+    $html .= '</th><th>';
+    $html .= $this -> linkTo( ucfirst( $this -> bibFieldNames[ 'publisher' ] ), $this -> indexURL, $criteria,
+      array( 'publisher' => -$this -> nvl( $order, 'publisher', -1 ) ) );
+    $html .= '</th><th>';
+    $html .= $this -> linkTo( ucfirst( $this -> bibFieldNames[ 'journal' ] ), $this -> indexURL, $criteria,
+      array( 'journal' => -$this -> nvl( $order, 'journal', -1 ) ) );
+    $html .= '</th></tr>';
+    foreach( $collection as $obj ) {
+      $html .= '<tr>';
+      $html .= '<td>' . $this -> linkToId( '&gt;&gt;', $this -> showURL, $obj[ $this -> idField ] ) . '</td>';
+      $html .= '<td>' . $obj['year'] . '</td>';
+      $html .= '<td>' . $obj['title'] . '</td>';
+      $html .= '<td>' . $obj['author'] . '</td>';
+      $html .= '<td>' . $obj['publisher'] . '</td>';
+      $html .= '<td>' . $obj['journal'] . '</td>';
+      $html .= '</tr>';
     }
     $html .= '</table>';
     return $html;
@@ -399,6 +442,10 @@
 
   protected function genBibkey( $obj ) {
     return $this -> genAuthorHash( $obj[ 'author' ] ) . $this -> genYearHash( $obj[ 'year' ] ) . $this -> genTitleHash( $obj[ 'title' ] );
+  }
+
+  protected function nvl( $array, $key, $replace ) {
+    if( in_array( $key, array_keys( $array ) ) ) return $array[ $key ]; else return $replace;
   }
   
 }
