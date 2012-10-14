@@ -246,20 +246,25 @@
     return $this -> paramSortPrefix . $key;
   }
 
-  protected function linkTo( $title, $url, $fields = array(), $order = array(), $others = array() ) {
-    return '<a class="bibwiki-link" href="' . $this -> createUrl( $url, $fields, $order, $others ) . '">' . $title . '</a>';
+  protected function linkTo( $title, $url ) {
+    return '<a class="bibwiki-link" href="' . $url . '">' . $title . '</a>';
   }
-  protected function linkToBlank( $title, $url, $fields = array(), $order = array(), $others = array() ) {
-    return '<a class="bibwiki-link" href="' . $this -> createUrl( $url, $fields, $order, $others ) . '" target="_blank">' . $title . '</a>';
-  }
-  protected function linkToId( $title, $url, $id, $others = array() ) {
-    return $this -> linkTo( $title, $url, array( $this -> idField => $id ), array(), $others );
-  }
-  protected function linkToIdBlank( $title, $url, $id, $others = array() ) {
-    return $this -> linkToBlank( $title, $url, array( $this -> idField => $id ), array(), $others );
+  protected function linkToBlank( $title, $url ) {
+    return '<a class="bibwiki-link" href="' . $url . '" target="_blank">' . $title . '</a>';
   }
 
-  private function createUrl( $base, $fields, $order, $others ) {
+  protected function printableUrlTo( $base, $fields = array(), $order = array(), $others = array() ) {
+    $others['printable'] = 'yes';
+    return $this -> urlTo( $base, $fields, $order, $others );
+  }
+  protected function urlToId( $base, $id ) {
+    return $this -> urlTo( $base, array( $this -> idField => $id ) );
+  }
+  protected function printableUrlToId( $base, $id ) {
+    return $this -> printableUrlTo( $base, array( $this -> idField => $id ) );
+  }
+
+  protected function urlTo( $base, $fields, $order, $others ) {
     $parary = array();
     $parurl = $base;
     foreach( $fields as $key => $value ) {
@@ -324,7 +329,7 @@
 
   function getDestroyForm( $obj ) {
     $html = '<form class="bibwiki-form" action="' . $this -> deleteURL . '" method="post">';
-    $html .= '<input name="pub_id" type="hidden" value="' . $obj[ $this -> idField ] . '"></input>';
+    $html .= '<input name="' . $this -> toParamName( $this -> idField ) . '" type="hidden" value="' . $obj[ $this -> idField ] . '"></input>';
     $html .= '<input type="submit" value="Delete" />';
     $html .= '</form>';
     return $html;
@@ -351,25 +356,25 @@
   function getEditHtml( $obj, $type ) {
     $html = '';
     $html .= '<form action="" method="post">';
-    $html .= '<input name="pub_id" type="hidden" value="' . $obj[ $this -> idField ] . '" />' ;
-    $html .= '<input name="pub_entry_type" type="text" readonly="readonly" value="' . $type . '" />' ;
+    $html .= '<input name="' . $this -> toParamName( $this -> idField ) . '" type="hidden" value="' . $obj[ $this -> idField ] . '" />' ;
+    $html .= '<input name="' . $this -> toParamName( $this -> typeField ) . '" type="text" readonly="readonly" value="' . $type . '" />' ;
     foreach( array( 'required', 'optional' ) as $fieldRequirement ) {
       $html .= '<fieldset><legend>' . ucfirst( $fieldRequirement ) . '</legend>';
 
       foreach( $this -> bibEntryTypeFields[ $type ][ $fieldRequirement ] as $bibField ) {
-        $html .= '<label for="pub_' . $bibField . '">' . ucfirst( $this -> bibFieldNames[ $bibField ] ) . '</label><br />' ;
+        $html .= '<label for="' . $this -> toParamName( $bibField  ) . '">' .
+          ucfirst( $this -> bibFieldNames[ $bibField ] ) . '</label><br />' ;
         $html .= '<small>' . $this -> bibFieldDescs[ $bibField ] . '</small><br />';
         switch( $this -> fieldOptions[ $bibField ][ 'type' ] ) {
           case 'string':
-            $html .= '<input name="pub_' . $bibField . '" type="text" value="' . $obj[ $bibField ] .
+            $html .= '<input name="' . $this -> toParamName( $bibField ) . '" type="text" value="' . $obj[ $bibField ] .
               '" size="' . $this -> fieldOptions[ $bibField ][ 'size' ] . '"></input><br /><br />' ;
             break;
           case 'text':
-            $html .= '<textarea name="pub_' . $bibField . '" cols="' . $this -> fieldOptions[ $bibField ][ 'cols' ] . '"' .
-              ' rows="' . $this -> fieldOptions[ $bibField ][ 'rows' ] . '">' . $obj[ $bibField ] . '</textarea><br /><br />' ;
+            $html .= '<textarea name="' . $this -> toParamName( $bibField ) . '" cols="' . $this -> fieldOptions[ $bibField ][ 'cols' ] .
+              '"' . ' rows="' . $this -> fieldOptions[ $bibField ][ 'rows' ] . '">' . $obj[ $bibField ] . '</textarea><br /><br />' ;
             break;
         }
-        //$html .= '<input name="pub_' . $bibField . '" type="text" value="' . $obj[ $bibField ] . '" size="70"></input><br /><br />' ;
       }
       $html .= '</fieldset>';
     }
@@ -415,24 +420,24 @@
   function getIndexHtml( $collection, $criteria, $order ) {
     $html = '<table class="bibwiki-table">';
     $html .= '<tr><th></th><th>';
-    $html .= $this -> linkTo( ucfirst( $this -> bibFieldNames[ 'year' ] ), $this -> indexURL, $criteria,
-      array( 'year' => -$this -> nvl( $order, 'year', -1 ) ) );
+    $html .= $this -> linkTo( ucfirst( $this -> bibFieldNames[ 'year' ] ), $this -> urlTo( $this -> indexURL, $criteria,
+      array( 'year' => -$this -> nvl( $order, 'year', -1 ) ) ) );
     $html .= '</th><th>';
-    $html .= $this -> linkTo( ucfirst( $this -> bibFieldNames[ 'title' ] ), $this -> indexURL, $criteria,
-      array( 'title' => -$this -> nvl( $order, 'title', -1 ) ) );
+    $html .= $this -> linkTo( ucfirst( $this -> bibFieldNames[ 'title' ] ), $this -> urlTo( $this -> indexURL, $criteria,
+      array( 'title' => -$this -> nvl( $order, 'title', -1 ) ) ) );
     $html .= '</th><th>';
-    $html .= $this -> linkTo( ucfirst( $this -> bibFieldNames[ 'author' ] ), $this -> indexURL, $criteria,
-      array( 'author' => -$this -> nvl( $order, 'author', -1 ) ) );
+    $html .= $this -> linkTo( ucfirst( $this -> bibFieldNames[ 'author' ] ), $this -> urlTo( $this -> indexURL, $criteria,
+      array( 'author' => -$this -> nvl( $order, 'author', -1 ) ) ) );
     $html .= '</th><th>';
-    $html .= $this -> linkTo( ucfirst( $this -> bibFieldNames[ 'publisher' ] ), $this -> indexURL, $criteria,
-      array( 'publisher' => -$this -> nvl( $order, 'publisher', -1 ) ) );
+    $html .= $this -> linkTo( ucfirst( $this -> bibFieldNames[ 'publisher' ] ), $this -> urlTo( $this -> indexURL, $criteria,
+      array( 'publisher' => -$this -> nvl( $order, 'publisher', -1 ) ) ) );
     $html .= '</th><th>';
-    $html .= $this -> linkTo( ucfirst( $this -> bibFieldNames[ 'journal' ] ), $this -> indexURL, $criteria,
-      array( 'journal' => -$this -> nvl( $order, 'journal', -1 ) ) );
+    $html .= $this -> linkTo( ucfirst( $this -> bibFieldNames[ 'journal' ] ), $this -> urlTo( $this -> indexURL, $criteria,
+      array( 'journal' => -$this -> nvl( $order, 'journal', -1 ) ) ) );
     $html .= '</th></tr>';
     foreach( $collection as $obj ) {
       $html .= '<tr>';
-      $html .= '<td>' . $this -> linkToId( '&gt;&gt;', $this -> showURL, $obj[ $this -> idField ] ) . '</td>';
+      $html .= '<td>' . $this -> linkTo( '&gt;&gt;', $this -> urlToId( $this -> showURL, $obj[ $this -> idField ] ) ) . '</td>';
       $html .= '<td>' . $obj['year'] . '</td>';
       $html .= '<td>' . $obj['title'] . '</td>';
       $html .= '<td>' . $obj['author'] . '</td>';

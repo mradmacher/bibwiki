@@ -12,7 +12,7 @@
     $obj = $this -> findById( $pub_id );
 
     $wgOut -> addHtml( $this -> linkTo( 'Index', $this -> indexURL ) );
-    $wgOut -> addHtml( $this -> linkToId( 'Show', $this -> showURL, $obj[ $this -> idField ] ) );
+    $wgOut -> addHtml( $this -> linkTo( 'Show', $this -> urlToId( $this -> showURL, $obj[ $this -> idField ] ) ) );
 
     if( $wgRequest -> wasPosted() ) {
       $obj = $this -> parseFields( $wgRequest );

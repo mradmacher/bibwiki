@@ -28,7 +28,7 @@
       $cursor = $this -> find( $criteria ) -> sort( $order );
       $wgOut -> addHtml( $this -> getPrintableIndexHtml( $cursor ) );
     } else {
-      $wgOut -> addHtml( $this -> linkToBlank( 'Printable', $this -> indexURL, $criteria, $order, array( 'printable' => 'yes' ) ) );
+      $wgOut -> addHtml( $this -> linkToBlank( 'Printable', $this -> printableUrlTo(  $this -> indexURL, $criteria, $order ) ) );
       $wgOut -> addHtml( $this -> linkTo( 'New', $this -> newURL ) );
       $wgOut -> addHtml( $this -> linkTo( 'Import', $this -> importURL ) );
 

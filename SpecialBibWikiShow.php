@@ -14,14 +14,14 @@
       if( $this -> isPrintable() ) {
         $wgOut -> setPageTitle( '' );
       } else {
-        $wgOut -> addHtml( $this -> linkToIdBlank( 'Printable', $this -> showURL, $pub_id, array( 'printable' => 'yes' ) ) );
+        $wgOut -> addHtml( $this -> linkToBlank( 'Printable', $this -> printableUrlToId( $this -> showURL, $pub_id ) ) );
         if( strpos( $_SERVER['HTTP_REFERER'], $this -> indexURL ) ) {
           $wgOut -> addHtml( $this -> linkTo( 'Index', $_SERVER['HTTP_REFERER'] ) );
         } else {
           $wgOut -> addHtml( $this -> linkTo( 'Index', $this -> indexURL ) );
         }
-        $wgOut -> addHtml( $this -> linkToId( 'Modify', $this -> modifyURL, $obj[ $this -> idField ] ) );
-        $wgOut -> addHtml( $this -> linkToId( 'Delete', $this -> deleteURL, $obj[ $this -> idField ] ) );
+        $wgOut -> addHtml( $this -> linkTo( 'Modify', $this -> urlToId( $this -> modifyURL, $obj[ $this -> idField ] ) ) );
+        $wgOut -> addHtml( $this -> linkTo( 'Delete', $this -> urlToId( $this -> deleteURL, $obj[ $this -> idField ] ) ) );
       }
       $wgOut -> addHtml( $this -> getShowHtml( $obj ) );
     }

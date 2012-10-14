@@ -31,7 +31,7 @@
         $html = '';
         $html .= '<dl>';
         foreach( $this -> bibEntryTypes as $type ) {
-          $html .= '<dt>' . $this -> linkTo( $type, $this -> newUrl, array( $this -> typeField => $type ) ) . '</dt>';
+          $html .= '<dt>' . $this -> linkTo( $type, $this -> urlTo( $this -> newUrl, array( $this -> typeField => $type ) ) ) . '</dt>';
           $html .= '<dd><small>' . $this -> bibEntryTypeDescs[ $type ] . '</small></dd>';
         }
         $html .= '</dl>';
