@@ -12,6 +12,8 @@
   protected $typeField = 'entry_type';
   protected $bibkeyField = 'bibkey';
 
+  protected $printable = false;
+
   protected $bibFields = array( 'address', 'annote', 'author', 'booktitle', 'chapter', 'crossref',
       'edition', 'editor', 'eprint', 'howpublished', 'institution', 'journal', 'key',
       'month', 'note', 'number', 'organization', 'pages', 'publisher', 'school', 'series',
@@ -244,25 +246,35 @@
     return $this -> paramSortPrefix . $key;
   }
 
-  protected function linkTo( $title, $url, $params = array(), $order = array(), $others = array() ) {
+  protected function linkTo( $title, $url, $fields = array(), $order = array(), $others = array() ) {
+    return '<a class="bibwiki-link" href="' . $this -> createUrl( $url, $fields, $order, $others ) . '">' . $title . '</a>';
+  }
+  protected function linkToBlank( $title, $url, $fields = array(), $order = array(), $others = array() ) {
+    return '<a class="bibwiki-link" href="' . $this -> createUrl( $url, $fields, $order, $others ) . '" target="_blank">' . $title . '</a>';
+  }
+  protected function linkToId( $title, $url, $id, $others = array() ) {
+    return $this -> linkTo( $title, $url, array( $this -> idField => $id ), array(), $others );
+  }
+  protected function linkToIdBlank( $title, $url, $id, $others = array() ) {
+    return $this -> linkToBlank( $title, $url, array( $this -> idField => $id ), array(), $others );
+  }
+
+  private function createUrl( $base, $fields, $order, $others ) {
     $parary = array();
-    $parurl = $url;
-    foreach( $params as $key => $value ) {
-      array_push( $parary, $this -> paramPrefix . $key . '=' . $value );
+    $parurl = $base;
+    foreach( $fields as $key => $value ) {
+      array_push( $parary, $this -> paramPrefix . $key . '=' . urlencode($value) );
     }
     foreach( $order as $key => $value ) {
-      array_push( $parary, $this -> paramSortPrefix . $key . '=' . $value );
+      array_push( $parary, $this -> paramSortPrefix . $key . '=' . urlencode($value) );
     }
     foreach( $others as $key => $value ) {
-      array_push( $parary, $key . '=' . $value );
+      array_push( $parary, $key . '=' . urlencode($value) );
     }
     if( count( $parary ) > 0 ) {
       $parurl .= '?' . join( $parary, '&' );
     }
-    return '<a class="bibwiki-link" href="' . $parurl . '">' . $title . '</a>';
-  }
-  protected function linkToId( $title, $url, $id ) {
-    return $this -> linkTo( $title, $url, array( $this -> idField => $id ) );
+    return $parurl;
   }
 
   protected function getCSS() {
@@ -284,7 +296,14 @@
     if( !$wgUser -> isLoggedIn() ) {
       $this -> displayRestrictionError();
     }
+    $this -> printable = false;
+    if( $wgRequest -> getText( 'printable' ) == 'yes' ) {
+      $this -> printable = true;
+    }
     $wgOut -> addInlineStyle( $this -> getCSS() );
+  }
+  function isPrintable() {
+    return $this -> printable;
   }
 
   function getSearchForm( $criteria, $order ) {
@@ -313,10 +332,9 @@
 
   function getShowHtml( $obj ) {
     $html = '';
+    $html .= '<p>' . ucfirst( $obj[ $this -> typeField ] ) . '';
     $html .= '<br />';
-    $html .= '<b>' . ucfirst( $obj[ $this -> typeField ] ) . '</b>';
-    $html .= '<br />';
-    $html .= '<small>' . $obj[ $this -> bibkeyField ] . '</small>';
+    $html .= '<small>' . $obj[ $this -> bibkeyField ] . '</small></p>';
     $html .= '<dl>';
     $type = $obj[ $this -> typeField ];
     foreach( array( 'required', 'optional' ) as $fieldRequirement ) {
