@@ -14,12 +14,12 @@
 
   protected $printable = false;
 
-  protected $bibFields = array( 'address', 'annote', 'author', 'booktitle', 'chapter', 'crossref',
+  protected $fields = array( 'address', 'annote', 'author', 'booktitle', 'chapter', 'crossref',
       'edition', 'editor', 'eprint', 'howpublished', 'institution', 'journal', 'key',
       'month', 'note', 'number', 'organization', 'pages', 'publisher', 'school', 'series',
       'title', 'type', 'url', 'volume', 'year' );
 
-  protected $bibFieldNames = array(
+  protected $fieldNames = array(
       'address' => 'address',
       'annote' => 'annotation',
       'author' => 'author',
@@ -47,7 +47,7 @@
       'volume' => 'volume',
       'year' => 'year' );
 
-  protected $bibFieldDescs = array(
+  protected $fieldDescs = array(
     'address' => 'Publisher\'s address (usually just the city, but can be the full address for lesser-known publishers)',
     'annote' => 'An annotation for annotated bibliography styles (not typical)',
     'author' => 'The name(s) of the author(s) (in the case of more than one author, separated by and)',
@@ -73,12 +73,12 @@
     'type' => 'The field overriding the default type of publication (e.g. "Research Note" for techreport, "{PhD} dissertation" for phdthesis, "Section" for inbook/incollection)',
     'url' => 'The WWW address',
     'volume' => 'The volume of a journal or multi-volume book',
-    'year' => 'The year of publication (or, if unpublished, the year of creation)');
+    'year' => 'The year of publication (or, if unpublished, the year of creation)' );
 
-  protected $bibEntryTypes = array( 'article', 'book', 'booklet', 'inbook', 'incollection', 'inproceedings',
+  protected $entryTypes = array( 'article', 'book', 'booklet', 'inbook', 'incollection', 'inproceedings',
     'manual', 'mastersthesis', 'misc', 'phdthesis', 'proceedings', 'techreport', 'unpublished', 'conference' );
 
-  protected $bibEntryTypeDescs = array(
+  protected $entryTypeDescs = array(
     'article' => 'An article from a journal or magazine.', 
     'book' => 'A book with an explicit publisher.',
     'booklet' => 'A work that is printed and bound, but without a named publisher or sponsoring institution.',
@@ -94,7 +94,7 @@
     'techreport' => 'A report published by a school or other institution, usually numbered within a series.',
     'unpublished' => 'A document having an author and title, but not formally published.' );
 
-  protected $bibEntryTypeFields = array(
+  protected $entryTypeFields = array(
     'article' => array( 
         'required' => array( 'author', 'title', 'journal', 'year' ),
         'optional' => array( 'volume', 'number', 'pages', 'month', 'note', 'key' ) 
@@ -109,7 +109,7 @@
         ),
     'inbook' => array( 
         'required' => array( /*'author/editor'*/ 'author', 'editor', 'title', 'chapter/pages', 'publisher', 'year' ),
-        'optional' => array( /*'volume/number'*/'volume', 'number', 'series', 'type', 'address', 'edition', 'month', 'note', 'key' ) 
+        'optional' => array( /*'volume/number'*/ 'volume', 'number', 'series', 'type', 'address', 'edition', 'month', 'note', 'key' ) 
         ),
     'incollection' => array( 
         'required' => array( 'author', 'title', 'booktitle', 'publisher', 'year' ),
@@ -342,7 +342,7 @@
     $html = '<br />';
     $html .= '<form class="bibwiki-search" action="' . $this -> indexURL . '" method="get">';
     foreach( $this -> searcheableFields as $field ) {
-      $html .= '<label for="' . $this -> toParamName( $field ) . '">' . ucfirst($this -> bibFieldNames[$field]) . '</label>';
+      $html .= '<label for="' . $this -> toParamName( $field ) . '">' . ucfirst($this -> fieldNames[$field]) . '</label>';
       $html .= '<input name="' . $this -> toParamName( $field ) . '" type="text" size="40" ';
       $html .= 'value="' . $criteria[ $field ] . '" /><br />';
     }
@@ -355,8 +355,9 @@
   }
 
   function getDestroyForm( $obj ) {
-    $html = '<form class="bibwiki-form" action="' . $this -> deleteURL . '" method="post">';
-    $html .= '<input name="' . $this -> toParamName( $this -> idField ) . '" type="hidden" value="' . $obj[ $this -> idField ] . '"></input>';
+    $html = '<form class="bibwiki-form" action="" method="post">';
+    $html .= '<input name="' . $this -> toParamName( $this -> idField ) . '" type="hidden" value="' .
+      $obj[ $this -> idField ] . '"></input>';
     $html .= '<input type="submit" value="Delete" />';
     $html .= '</form>';
     return $html;
@@ -370,10 +371,10 @@
     $html .= '<dl>';
     $type = $obj[ $this -> typeField ];
     foreach( array( 'required', 'optional' ) as $fieldRequirement ) {
-      foreach( $this -> bibEntryTypeFields[ $type ][ $fieldRequirement ] as $bibField ) {
+      foreach( $this -> entryTypeFields[ $type ][ $fieldRequirement ] as $bibField ) {
         $value = $obj[ $bibField ];
         if( $value != '' ) {
-          $html .= '<dt>' . ucfirst( $this -> bibFieldNames[ $bibField ] ) . '</dt><dd>' . $value . '</dd>';
+          $html .= '<dt>' . ucfirst( $this -> fieldNames[ $bibField ] ) . '</dt><dd>' . $value . '</dd>';
         }
       }
     }
@@ -388,10 +389,10 @@
     foreach( array( 'required', 'optional' ) as $fieldRequirement ) {
       $html .= '<fieldset><legend>' . ucfirst( $fieldRequirement ) . '</legend>';
 
-      foreach( $this -> bibEntryTypeFields[ $type ][ $fieldRequirement ] as $bibField ) {
+      foreach( $this -> entryTypeFields[ $type ][ $fieldRequirement ] as $bibField ) {
         $html .= '<label for="' . $this -> toParamName( $bibField  ) . '">' .
-          ucfirst( $this -> bibFieldNames[ $bibField ] ) . '</label><br />' ;
-        $html .= '<small>' . $this -> bibFieldDescs[ $bibField ] . '</small><br />';
+          ucfirst( $this -> fieldNames[ $bibField ] ) . '</label><br />' ;
+        $html .= '<small>' . $this -> fieldDescs[ $bibField ] . '</small><br />';
         switch( $this -> fieldOptions[ $bibField ][ 'type' ] ) {
           case 'string':
             $html .= '<input name="' . $this -> toParamName( $bibField ) . '" type="text" value="' . $obj[ $bibField ] .
@@ -421,15 +422,15 @@
   function getPrintableIndexHtml( $collection ) {
     $html = '<table class="bibwiki-table">';
     $html .= '<tr><th>';
-    $html .= ucfirst( $this -> bibFieldNames[ 'year' ] );
+    $html .= ucfirst( $this -> fieldNames[ 'year' ] );
     $html .= '</th><th>';
-    $html .= ucfirst( $this -> bibFieldNames[ 'title' ] );
+    $html .= ucfirst( $this -> fieldNames[ 'title' ] );
     $html .= '</th><th>';
-    $html .= ucfirst( $this -> bibFieldNames[ 'author' ] );
+    $html .= ucfirst( $this -> fieldNames[ 'author' ] );
     $html .= '</th><th>';
-    $html .= ucfirst( $this -> bibFieldNames[ 'publisher' ] );
+    $html .= ucfirst( $this -> fieldNames[ 'publisher' ] );
     $html .= '</th><th>';
-    $html .= ucfirst( $this -> bibFieldNames[ 'journal' ] );
+    $html .= ucfirst( $this -> fieldNames[ 'journal' ] );
     $html .= '</th></tr>';
     foreach( $collection as $obj ) {
       $html .= '<tr>';
@@ -447,19 +448,19 @@
   function getIndexHtml( $collection, $criteria, $order ) {
     $html = '<table class="bibwiki-table">';
     $html .= '<tr><th></th><th>';
-    $html .= $this -> linkTo( ucfirst( $this -> bibFieldNames[ 'year' ] ), $this -> indexPath( $criteria,
+    $html .= $this -> linkTo( ucfirst( $this -> fieldNames[ 'year' ] ), $this -> indexPath( $criteria,
       array( 'year' => -$this -> nvl( $order, 'year', -1 ) ) ) );
     $html .= '</th><th>';
-    $html .= $this -> linkTo( ucfirst( $this -> bibFieldNames[ 'title' ] ), $this -> indexPath( $criteria,
+    $html .= $this -> linkTo( ucfirst( $this -> fieldNames[ 'title' ] ), $this -> indexPath( $criteria,
       array( 'title' => -$this -> nvl( $order, 'title', -1 ) ) ) );
     $html .= '</th><th>';
-    $html .= $this -> linkTo( ucfirst( $this -> bibFieldNames[ 'author' ] ), $this -> indexPath( $criteria,
+    $html .= $this -> linkTo( ucfirst( $this -> fieldNames[ 'author' ] ), $this -> indexPath( $criteria,
       array( 'author' => -$this -> nvl( $order, 'author', -1 ) ) ) );
     $html .= '</th><th>';
-    $html .= $this -> linkTo( ucfirst( $this -> bibFieldNames[ 'publisher' ] ), $this -> indexPath( $criteria,
+    $html .= $this -> linkTo( ucfirst( $this -> fieldNames[ 'publisher' ] ), $this -> indexPath( $criteria,
       array( 'publisher' => -$this -> nvl( $order, 'publisher', -1 ) ) ) );
     $html .= '</th><th>';
-    $html .= $this -> linkTo( ucfirst( $this -> bibFieldNames[ 'journal' ] ), $this -> indexPath( $criteria,
+    $html .= $this -> linkTo( ucfirst( $this -> fieldNames[ 'journal' ] ), $this -> indexPath( $criteria,
       array( 'journal' => -$this -> nvl( $order, 'journal', -1 ) ) ) );
     $html .= '</th></tr>';
     foreach( $collection as $obj ) {
@@ -481,7 +482,7 @@
     $obj[ $this -> typeField ] = $request -> getVal( $this -> toParamName( $this -> typeField ) );
     $obj[ $this -> idField ] = $request -> getVal( $this -> toParamName( $this -> idField ) );
 
-    foreach( $this -> bibFields as $field ) {
+    foreach( $this -> fields as $field ) {
       $value = $request -> getVal( $this -> toParamName( $field ) );
       if( $value != '' ) {
         $obj[$field] = $value;

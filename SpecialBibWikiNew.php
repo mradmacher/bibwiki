@@ -30,9 +30,9 @@
       } else {
         $html = '';
         $html .= '<dl>';
-        foreach( $this -> bibEntryTypes as $type ) {
+        foreach( $this -> entryTypes as $type ) {
           $html .= '<dt>' . $this -> linkTo( $type, $this -> newPath( array( $this -> typeField => $type ) ) ) . '</dt>';
-          $html .= '<dd><small>' . $this -> bibEntryTypeDescs[ $type ] . '</small></dd>';
+          $html .= '<dd><small>' . $this -> entryTypeDescs[ $type ] . '</small></dd>';
         }
         $html .= '</dl>';
         $wgOut -> addHtml( $html );
