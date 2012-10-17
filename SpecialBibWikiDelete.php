@@ -15,7 +15,7 @@
       $obj = array();
     }
 
-    $wgOut -> addHtml( $this -> linkTo( 'Index', $this -> indexURL ) );
+    $wgOut -> addHtml( $this -> linkTo( 'Index', $this -> indexPath() ) );
     if( $wgRequest -> wasPosted() ) {
       $this -> removeById( $pub_id );
       $wgOut -> addWikiText( "Publication successfuly deleted." );

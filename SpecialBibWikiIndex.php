@@ -28,9 +28,9 @@
       $cursor = $this -> find( $criteria ) -> sort( $order );
       $wgOut -> addHtml( $this -> getPrintableIndexHtml( $cursor ) );
     } else {
-      $wgOut -> addHtml( $this -> linkToBlank( 'Printable', $this -> printableUrlTo(  $this -> indexURL, $criteria, $order ) ) );
-      $wgOut -> addHtml( $this -> linkTo( 'New', $this -> newURL ) );
-      $wgOut -> addHtml( $this -> linkTo( 'Import', $this -> importURL ) );
+      $wgOut -> addHtml( $this -> linkToBlank( 'Printable', $this -> printableIndexPath( $criteria, $order ) ) );
+      $wgOut -> addHtml( $this -> linkTo( 'New', $this -> newPath() ) );
+      $wgOut -> addHtml( $this -> linkTo( 'Import', $this -> importPath() ) );
 
       $wgOut -> addHtml( $this -> getSearchForm( $criteria, $order ) );
       $cursor = $this -> find( $criteria ) -> sort( $order );

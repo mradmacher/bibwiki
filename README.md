@@ -26,7 +26,8 @@ Default settings can be changed in `LocalSettings.php`.
 Currently there are following configuration options available:
 * `$wgBibWikiTmpDir` (defaults to "/tmp") - the name of the directory that can be used for storing temporary data;
   it should be readable and writeable for the web server
-* `$wgBibWikiDBName` (defaults to "bibwiki") - the name the database that will be used by MongoDB
+* `$wgBibWikiDBName` (defaults to "bibwiki") - the name of the database that will be used by MongoDB
+* `$wgBibWikiPathPrefix` (defaults to "/wiki") - the prefix that should be prepended to names of the special pages
 
 Usage
 -----

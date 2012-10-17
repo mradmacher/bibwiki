@@ -11,9 +11,9 @@
     $curdir = dirname( __FILE__ );
     //$upldir = '/tmp';
 
-    $wgOut -> addHtml( $this -> linkTo( 'Index', $this -> indexURL ) );
+    $wgOut -> addHtml( $this -> linkTo( 'Index', $this -> indexPath() ) );
     if( $wgRequest -> wasPosted() ) {
-      $wgOut -> addHtml( $this -> linkTo( 'Import', $this -> importURL ) );
+      $wgOut -> addHtml( $this -> linkTo( 'Import', $this -> importPath() ) );
       $file = tempnam( $wgBibWikiTmpDir, 'bib' );
       $fh = fopen( $file, 'w' ) or die( "can't open file" );
       fwrite( $fh, $wgRequest -> getVal( 'pub_bib' ) );
@@ -41,7 +41,7 @@
       $wgOut -> addWikiText( 'Already existing: ' . $duplicates_count );
     } else {
       $html = '';
-      $html .= '<form action="' . $this -> bibWikiImportURL . '" method="post">';
+      $html .= '<form action="" method="post">';
       $html .= '<label for="pub_bib">BibTeX</label><br />';
       $html .= '<textarea rows="30" cols="80" name="pub_bib"></textarea><br />' ;
       $html .= '<input type="submit" value="Import" />'; 

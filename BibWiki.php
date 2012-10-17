@@ -42,4 +42,5 @@ $wgSpecialPageGroups[ 'BibWikiNew' ] = 'bibwiki';
 
 $wgBibWikiTmpDir = '/tmp';
 $wgBibWikiDBName = 'bibwiki';
+$wgBibWikiPathPrefix = '/wiki';
 ?>

@@ -10,7 +10,7 @@
 
     $obj = array();
 
-    $wgOut -> addHtml( $this -> linkTo( 'Index', $this -> indexURL ) );
+    $wgOut -> addHtml( $this -> linkTo( 'Index', $this -> indexPath() ) );
     if( $wgRequest -> wasPosted() ) {
       $obj = $this -> parseFields( $wgRequest );
       $key = $this -> genBibkey( $obj );
@@ -24,14 +24,14 @@
     } else {
       $pub_type = $wgRequest -> getText( 'pub_entry_type' );
       if( $pub_type != '' ) {
-        $wgOut -> addHtml( $this -> linkTo( 'New', $this -> newURL ) );
+        $wgOut -> addHtml( $this -> linkTo( 'New', $this -> newPath() ) );
         $obj[ $this -> typeField ] = $pub_type;
         $wgOut -> addHtml( $this -> getNewHtml( $obj, $pub_type ) );
       } else {
         $html = '';
         $html .= '<dl>';
         foreach( $this -> bibEntryTypes as $type ) {
-          $html .= '<dt>' . $this -> linkTo( $type, $this -> urlTo( $this -> newUrl, array( $this -> typeField => $type ) ) ) . '</dt>';
+          $html .= '<dt>' . $this -> linkTo( $type, $this -> newPath( array( $this -> typeField => $type ) ) ) . '</dt>';
           $html .= '<dd><small>' . $this -> bibEntryTypeDescs[ $type ] . '</small></dd>';
         }
         $html .= '</dl>';

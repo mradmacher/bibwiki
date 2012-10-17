@@ -1,10 +1,10 @@
 <?php class SpecialBibWiki extends SpecialPage {
-  protected $indexURL = '/wiki/Special:BibWikiIndex';
-  protected $showURL = '/wiki/Special:BibWikiShow';
-  protected $modifyURL = '/wiki/Special:BibWikiModify';
-  protected $newURL = '/wiki/Special:BibWikiNew';
-  protected $deleteURL = '/wiki/Special:BibWikiDelete';
-  protected $importURL = '/wiki/Special:BibWikiImport';
+  private $indexPath = '/Special:BibWikiIndex';
+  private $showPath = '/Special:BibWikiShow';
+  private $modifyPath = '/Special:BibWikiModify';
+  private $newPath = '/Special:BibWikiNew';
+  private $deletePath = '/Special:BibWikiDelete';
+  private $importPath = '/Special:BibWikiImport';
 
   protected $idField = '_id';
   protected $paramPrefix = 'pub_';
@@ -253,18 +253,45 @@
     return '<a class="bibwiki-link" href="' . $url . '" target="_blank">' . $title . '</a>';
   }
 
-  protected function printableUrlTo( $base, $fields = array(), $order = array(), $others = array() ) {
-    $others['printable'] = 'yes';
-    return $this -> urlTo( $base, $fields, $order, $others );
+  protected function indexPath( $fields = array(), $order = array() ) {
+    global $wgBibWikiPathPrefix;
+    return $this -> pathTo( $wgBibWikiPathPrefix . $this -> indexPath, $fields, $order );
   }
-  protected function urlToId( $base, $id ) {
-    return $this -> urlTo( $base, array( $this -> idField => $id ) );
+  protected function printableIndexPath( $fields = array(), $order = array() ) {
+    global $wgBibWikiPathPrefix;
+    return $this -> printablePathTo( $wgBibWikiPathPrefix . $this -> indexPath, $fields, $order );
   }
-  protected function printableUrlToId( $base, $id ) {
-    return $this -> printableUrlTo( $base, array( $this -> idField => $id ) );
+  protected function showPath( $id ) {
+    global $wgBibWikiPathPrefix;
+    return $this -> pathTo( $wgBibWikiPathPrefix . $this -> showPath, array( $this -> idField => $id ) );
+  }
+  protected function printableShowPath( $id ) {
+    global $wgBibWikiPathPrefix;
+    return $this -> printablePathTo( $wgBibWikiPathPrefix . $this -> showPath, array( $this -> idField => $id ) );
+  }
+  protected function modifyPath( $id ) {
+    global $wgBibWikiPathPrefix;
+    return $this -> pathTo( $wgBibWikiPathPrefix . $this -> modifyPath, array( $this -> idField => $id ) );
+  }
+  protected function deletePath( $id ) {
+    global $wgBibWikiPathPrefix;
+    return $this -> pathTo( $wgBibWikiPathPrefix . $this -> deletePath, array( $this -> idField => $id ) );
+  }
+  protected function newPath( $fields = array() ) {
+    global $wgBibWikiPathPrefix;
+    return $this -> pathTo( $wgBibWikiPathPrefix . $this -> newPath, $fields );
+  }
+  protected function importPath() {
+    global $wgBibWikiPathPrefix;
+    return $this -> pathTo( $wgBibWikiPathPrefix . $this -> importPath );
   }
 
-  protected function urlTo( $base, $fields, $order, $others ) {
+  protected function printablePathTo( $base, $fields = array(), $order = array(), $others = array() ) {
+    $others['printable'] = 'yes';
+    return $this -> pathTo( $base, $fields, $order, $others );
+  }
+
+  protected function pathTo( $base, $fields, $order, $others ) {
     $parary = array();
     $parurl = $base;
     foreach( $fields as $key => $value ) {
@@ -420,24 +447,24 @@
   function getIndexHtml( $collection, $criteria, $order ) {
     $html = '<table class="bibwiki-table">';
     $html .= '<tr><th></th><th>';
-    $html .= $this -> linkTo( ucfirst( $this -> bibFieldNames[ 'year' ] ), $this -> urlTo( $this -> indexURL, $criteria,
+    $html .= $this -> linkTo( ucfirst( $this -> bibFieldNames[ 'year' ] ), $this -> indexPath( $criteria,
       array( 'year' => -$this -> nvl( $order, 'year', -1 ) ) ) );
     $html .= '</th><th>';
-    $html .= $this -> linkTo( ucfirst( $this -> bibFieldNames[ 'title' ] ), $this -> urlTo( $this -> indexURL, $criteria,
+    $html .= $this -> linkTo( ucfirst( $this -> bibFieldNames[ 'title' ] ), $this -> indexPath( $criteria,
       array( 'title' => -$this -> nvl( $order, 'title', -1 ) ) ) );
     $html .= '</th><th>';
-    $html .= $this -> linkTo( ucfirst( $this -> bibFieldNames[ 'author' ] ), $this -> urlTo( $this -> indexURL, $criteria,
+    $html .= $this -> linkTo( ucfirst( $this -> bibFieldNames[ 'author' ] ), $this -> indexPath( $criteria,
       array( 'author' => -$this -> nvl( $order, 'author', -1 ) ) ) );
     $html .= '</th><th>';
-    $html .= $this -> linkTo( ucfirst( $this -> bibFieldNames[ 'publisher' ] ), $this -> urlTo( $this -> indexURL, $criteria,
+    $html .= $this -> linkTo( ucfirst( $this -> bibFieldNames[ 'publisher' ] ), $this -> indexPath( $criteria,
       array( 'publisher' => -$this -> nvl( $order, 'publisher', -1 ) ) ) );
     $html .= '</th><th>';
-    $html .= $this -> linkTo( ucfirst( $this -> bibFieldNames[ 'journal' ] ), $this -> urlTo( $this -> indexURL, $criteria,
+    $html .= $this -> linkTo( ucfirst( $this -> bibFieldNames[ 'journal' ] ), $this -> indexPath( $criteria,
       array( 'journal' => -$this -> nvl( $order, 'journal', -1 ) ) ) );
     $html .= '</th></tr>';
     foreach( $collection as $obj ) {
       $html .= '<tr>';
-      $html .= '<td>' . $this -> linkTo( '&gt;&gt;', $this -> urlToId( $this -> showURL, $obj[ $this -> idField ] ) ) . '</td>';
+      $html .= '<td>' . $this -> linkTo( '&gt;&gt;', $this -> showPath( $obj[ $this -> idField ] ) ) . '</td>';
       $html .= '<td>' . $obj['year'] . '</td>';
       $html .= '<td>' . $obj['title'] . '</td>';
       $html .= '<td>' . $obj['author'] . '</td>';

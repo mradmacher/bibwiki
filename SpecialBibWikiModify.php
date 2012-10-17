@@ -11,8 +11,8 @@
     $pub_id = $wgRequest -> getText( $this -> toParamName( $this -> idField ) );
     $obj = $this -> findById( $pub_id );
 
-    $wgOut -> addHtml( $this -> linkTo( 'Index', $this -> indexURL ) );
-    $wgOut -> addHtml( $this -> linkTo( 'Show', $this -> urlToId( $this -> showURL, $obj[ $this -> idField ] ) ) );
+    $wgOut -> addHtml( $this -> linkTo( 'Index', $this -> indexPath() ) );
+    $wgOut -> addHtml( $this -> linkTo( 'Show', $this -> showPath( $obj[ $this -> idField ] ) ) );
 
     if( $wgRequest -> wasPosted() ) {
       $obj = $this -> parseFields( $wgRequest );
