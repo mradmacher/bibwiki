@@ -17,7 +17,9 @@
   protected $fields = array( 'address', 'annote', 'author', 'booktitle', 'chapter', 'crossref',
       'edition', 'editor', 'eprint', 'howpublished', 'institution', 'journal', 'key',
       'month', 'note', 'number', 'organization', 'pages', 'publisher', 'school', 'series',
-      'title', 'type', 'url', 'volume', 'year' );
+      'title', 'type', 'url', 'volume', 'year', 'keywords' );
+
+  protected $arrayFields = array( 'keywords' );
 
   protected $fieldNames = array(
       'address' => 'address',
@@ -45,7 +47,8 @@
       'type' => 'field',
       'url' => 'url',
       'volume' => 'volume',
-      'year' => 'year' );
+      'year' => 'year',
+      'keywords' => 'keywords');
 
   protected $fieldDescs = array(
     'address' => 'Publisher\'s address (usually just the city, but can be the full address for lesser-known publishers)',
@@ -73,7 +76,8 @@
     'type' => 'The field overriding the default type of publication (e.g. "Research Note" for techreport, "{PhD} dissertation" for phdthesis, "Section" for inbook/incollection)',
     'url' => 'The WWW address',
     'volume' => 'The volume of a journal or multi-volume book',
-    'year' => 'The year of publication (or, if unpublished, the year of creation)' );
+    'year' => 'The year of publication (or, if unpublished, the year of creation)',
+    'keywords' => 'Keywords separated by commas');
 
   protected $entryTypes = array( 'article', 'book', 'booklet', 'inbook', 'incollection', 'inproceedings',
     'manual', 'mastersthesis', 'misc', 'phdthesis', 'proceedings', 'techreport', 'unpublished', 'conference' );
@@ -97,59 +101,59 @@
   protected $entryTypeFields = array(
     'article' => array( 
         'required' => array( 'author', 'title', 'journal', 'year' ),
-        'optional' => array( 'volume', 'number', 'pages', 'month', 'note', 'key' ) 
+        'optional' => array( 'volume', 'number', 'pages', 'month', 'note', 'key', 'keywords' ) 
         ),
     'book' => array( 
         'required' => array( /*'author/editor'*/ 'author', 'editor', 'title', 'publisher', 'year' ),
-        'optional' => array( /*'volume/number'*/ 'volume', 'number', 'series', 'address', 'edition', 'month', 'note', 'key' ) 
+        'optional' => array( /*'volume/number'*/ 'volume', 'number', 'series', 'address', 'edition', 'month', 'note', 'key', 'keywords' ) 
         ),
     'booklet' => array( 
         'required' => array( 'title' ),
-        'optional' => array( 'author', 'howpublished', 'address', 'month', 'year', 'note', 'key' ) 
+        'optional' => array( 'author', 'howpublished', 'address', 'month', 'year', 'note', 'key', 'keywords' ) 
         ),
     'inbook' => array( 
         'required' => array( /*'author/editor'*/ 'author', 'editor', 'title', 'chapter/pages', 'publisher', 'year' ),
-        'optional' => array( /*'volume/number'*/ 'volume', 'number', 'series', 'type', 'address', 'edition', 'month', 'note', 'key' ) 
+        'optional' => array( /*'volume/number'*/ 'volume', 'number', 'series', 'type', 'address', 'edition', 'month', 'note', 'key', 'keywords' ) 
         ),
     'incollection' => array( 
         'required' => array( 'author', 'title', 'booktitle', 'publisher', 'year' ),
-        'optional' => array( 'editor', /*'volume/number'*/'volume', 'number', 'series', 'type', 'chapter', 'pages', 'address', 'edition', 'month', 'note', 'key' )
+        'optional' => array( 'editor', /*'volume/number'*/'volume', 'number', 'series', 'type', 'chapter', 'pages', 'address', 'edition', 'month', 'note', 'key', 'keywords' )
         ),
     'inproceedings' => array( 
         'required' => array( 'author', 'title', 'booktitle', 'year' ),
-        'optional' => array( 'editor', /*'volume/number'*/'volume', 'number', 'series', 'pages', 'address', 'month', 'organization', 'publisher', 'note', 'key' ) 
+        'optional' => array( 'editor', /*'volume/number'*/'volume', 'number', 'series', 'pages', 'address', 'month', 'organization', 'publisher', 'note', 'key', 'keywords' ) 
         ),
     'manual' => array(
         'required' => array( 'title' ),
-        'optional' => array( 'author', 'organization', 'address', 'edition', 'month', 'year', 'note', 'key' )
+        'optional' => array( 'author', 'organization', 'address', 'edition', 'month', 'year', 'note', 'key', 'keywords' )
         ),
     'mastersthesis' => array(
         'required' => array( 'author', 'title', 'school', 'year' ),
-        'optional' => array( 'type', 'address', 'month', 'note', 'key' ),
+        'optional' => array( 'type', 'address', 'month', 'note', 'key', 'keywords' ),
         ),
     'misc' => array(
         'required' => array(),
-        'optional' => array( 'author', 'title', 'howpublished', 'month', 'year', 'note', 'key' )
+        'optional' => array( 'author', 'title', 'howpublished', 'month', 'year', 'note', 'key', 'keywords' )
         ),
     'phdthesis' => array(
         'required' => array( 'author', 'title', 'school', 'year' ),
-        'optional' => array( 'type', 'address', 'month', 'note', 'key' )
+        'optional' => array( 'type', 'address', 'month', 'note', 'key', 'keywords' )
         ),
     'proceedings' => array(
         'required' => array( 'title', 'year' ),
-        'optional' => array( 'editor', /*'volume/number'*/'volume', 'number', 'series', 'address', 'month', 'publisher', 'organization', 'note', 'key' )
+        'optional' => array( 'editor', /*'volume/number'*/'volume', 'number', 'series', 'address', 'month', 'publisher', 'organization', 'note', 'key', 'keywords' )
         ),
     'techreport' => array(
         'required' => array( 'author', 'title', 'institution', 'year' ),
-        'optional' => array( 'type', 'number', 'address', 'month', 'note', 'key' )
+        'optional' => array( 'type', 'number', 'address', 'month', 'note', 'key', 'keywords' )
         ),
     'unpublished' => array(
         'required' => array( 'author', 'title', 'note' ),
-        'optional' => array( 'month', 'year', 'key' )
+        'optional' => array( 'month', 'year', 'key', 'keywords' )
         ),
     'conference' => array(
         'required' => array( 'author', 'title', 'booktitle', 'year' ),
-        'optional' => array( 'editor', /*'volume/number'*/'volume', 'number', 'series', 'pages', 'address', 'month', 'organization', 'publisher', 'note', 'key' ) 
+        'optional' => array( 'editor', /*'volume/number'*/'volume', 'number', 'series', 'pages', 'address', 'month', 'organization', 'publisher', 'note', 'key', 'keywords' ) 
         )
     );
 
@@ -179,9 +183,10 @@
       'type' => array( 'type' => 'string', 'size' => 40 ),
       'url' => array( 'type' => 'string', 'size' => 80 ),
       'volume' => array( 'type' => 'string', 'size' => 20 ),
-      'year' => array( 'type' => 'string', 'size' => 4 ) );
+      'year' => array( 'type' => 'string', 'size' => 4 ),
+      'keywords' => array( 'type' => 'string', 'size' => 80 ) );
 
-  protected $searcheableFields = array( 'author', 'title', 'publisher', 'journal', 'year' );
+  protected $searcheableFields = array( 'author', 'title', 'publisher', 'journal', 'year', 'keywords' );
 
   function __construct( $name ) {
     parent::__construct( $name );
