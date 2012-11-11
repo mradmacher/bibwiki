@@ -19,8 +19,7 @@ $wgAutoloadClasses[ 'SpecialBibWikiDelete' ] = $dir . 'SpecialBibWikiDelete.php'
 $wgAutoloadClasses[ 'SpecialBibWikiImport' ] = $dir . 'SpecialBibWikiImport.php';
 $wgAutoloadClasses[ 'SpecialBibWikiNew' ] = $dir . 'SpecialBibWikiNew.php';
 $wgAutoloadClasses[ 'SpecialBibWikiModify' ] = $dir . 'SpecialBibWikiModify.php';
-//$wgExtensionMessagesFiles[ 'BibWiki' ] = $dir . 'BibWiki.i18n.php';
-//$wgExtensionMessagesFiles[ 'BibWiki' ] = $dir . 'BibWiki.alias.php';
+
 $wgExtensionMessagesFiles[ 'BibWikiIndex' ] = $dir . 'BibWiki.i18n.php';
 $wgExtensionMessagesFiles[ 'BibWikiShow' ] = $dir . 'BibWiki.i18n.php';
 $wgExtensionMessagesFiles[ 'BibWikiDelete' ] = $dir . 'BibWiki.i18n.php';

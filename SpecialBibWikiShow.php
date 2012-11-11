@@ -5,7 +5,7 @@
   }
 
   function execute( $par ) {
-    global $wgRequest, $wgOut;
+    global $wgRequest, $wgOut, $wgUser, $wgFileExtensions;
     parent::execute( $par );
   
     $pub_id = $wgRequest -> getText( $this -> toParamName( $this -> idField ) );
@@ -13,6 +13,7 @@
       $obj = $this -> findById( $pub_id );
       if( $this -> isPrintable() ) {
         $wgOut -> setPageTitle( '' );
+        $wgOut -> addHtml( $this -> getShowHtml( $obj ) );
       } else {
         $wgOut -> addHtml( $this -> linkToBlank( 'Printable', $this -> printableShowPath( $pub_id ) ) );
         if( strpos( $_SERVER['HTTP_REFERER'], $this -> indexPath() ) ) {
@@ -22,8 +23,9 @@
         }
         $wgOut -> addHtml( $this -> linkTo( 'Modify', $this -> modifyPath( $obj[ $this -> idField ] ) ) );
         $wgOut -> addHtml( $this -> linkTo( 'Delete', $this -> deletePath( $obj[ $this -> idField ] ) ) );
+        $wgOut -> addHtml( $this -> getShowHtml( $obj ) );
+        $wgOut -> addWikiText( '[[File:'. $pub_id . '.pdf | Upload File]]' );
       }
-      $wgOut -> addHtml( $this -> getShowHtml( $obj ) );
     }
   }
 

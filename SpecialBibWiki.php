@@ -11,6 +11,7 @@
   protected $paramSortPrefix = 'pubsort_';
   protected $typeField = 'entry_type';
   protected $bibkeyField = 'bibkey';
+  private $dbConnection;
 
   protected $printable = false;
 
@@ -112,7 +113,7 @@
         'optional' => array( 'author', 'howpublished', 'address', 'month', 'year', 'note', 'key', 'keywords' ) 
         ),
     'inbook' => array( 
-        'required' => array( /*'author/editor'*/ 'author', 'editor', 'title', 'chapter/pages', 'publisher', 'year' ),
+        'required' => array( /*'author/editor'*/ 'author', 'editor', 'title', /*'chapter/pages'*/ 'chapter', 'pages', 'publisher', 'year' ),
         'optional' => array( /*'volume/number'*/ 'volume', 'number', 'series', 'type', 'address', 'edition', 'month', 'note', 'key', 'keywords' ) 
         ),
     'incollection' => array( 
@@ -258,6 +259,24 @@
     return '<a class="bibwiki-link" href="' . $url . '" target="_blank">' . $title . '</a>';
   }
 
+  protected function pathTo( $base, $fields = array(), $order = array(), $others = array() ) {
+    $parary = array();
+    $parurl = $base;
+    foreach( $fields as $key => $value ) {
+      array_push( $parary, $this -> paramPrefix . $key . '=' . urlencode($value) );
+    }
+    foreach( $order as $key => $value ) {
+      array_push( $parary, $this -> paramSortPrefix . $key . '=' . urlencode($value) );
+    }
+    foreach( $others as $key => $value ) {
+      array_push( $parary, $key . '=' . urlencode($value) );
+    }
+    if( count( $parary ) > 0 ) {
+      $parurl .= '?' . join( $parary, '&' );
+    }
+    return $parurl;
+  }
+
   protected function indexPath( $fields = array(), $order = array() ) {
     global $wgBibWikiPathPrefix;
     return $this -> pathTo( $wgBibWikiPathPrefix . $this -> indexPath, $fields, $order );
@@ -296,24 +315,6 @@
     return $this -> pathTo( $base, $fields, $order, $others );
   }
 
-  protected function pathTo( $base, $fields, $order, $others ) {
-    $parary = array();
-    $parurl = $base;
-    foreach( $fields as $key => $value ) {
-      array_push( $parary, $this -> paramPrefix . $key . '=' . urlencode($value) );
-    }
-    foreach( $order as $key => $value ) {
-      array_push( $parary, $this -> paramSortPrefix . $key . '=' . urlencode($value) );
-    }
-    foreach( $others as $key => $value ) {
-      array_push( $parary, $key . '=' . urlencode($value) );
-    }
-    if( count( $parary ) > 0 ) {
-      $parurl .= '?' . join( $parary, '&' );
-    }
-    return $parurl;
-  }
-
   protected function getCSS() {
     $css = '';
     $css .= 'form.bibwiki-search {display: inline; margin-right: 5px;}';
@@ -345,15 +346,19 @@
 
   function getSearchForm( $criteria, $order ) {
     $html = '<br />';
-    $html .= '<form class="bibwiki-search" action="' . $this -> indexURL . '" method="get">';
+    $html .= '<form class="bibwiki-search" action="" method="get">';
     foreach( $this -> searcheableFields as $field ) {
       $html .= '<label for="' . $this -> toParamName( $field ) . '">' . ucfirst($this -> fieldNames[$field]) . '</label>';
       $html .= '<input name="' . $this -> toParamName( $field ) . '" type="text" size="40" ';
-      $html .= 'value="' . $criteria[ $field ] . '" /><br />';
+      if( array_key_exists( $field, $criteria ) ) {
+        $html .= 'value="' . $criteria[ $field ] . '" /><br />';
+      } else {
+        $html .= 'value="" /><br />';
+      }
     }
     $html .= '<input type="submit" value="Search" />';
     $html .= '</form>';
-    $html .= '<form class="bibwiki-search" action="' . $this -> indexURL . '" method="get">';
+    $html .= '<form class="bibwiki-search" action="" method="get">';
     $html .= '<input type="submit" value="Reset" />';
     $html .= '</form>';
     return $html;
@@ -377,9 +382,11 @@
     $type = $obj[ $this -> typeField ];
     foreach( array( 'required', 'optional' ) as $fieldRequirement ) {
       foreach( $this -> entryTypeFields[ $type ][ $fieldRequirement ] as $bibField ) {
-        $value = $obj[ $bibField ];
-        if( $value != '' ) {
-          $html .= '<dt>' . ucfirst( $this -> fieldNames[ $bibField ] ) . '</dt><dd>' . $value . '</dd>';
+        if( array_key_exists( $bibField, $obj ) ) {
+          $value = $obj[ $bibField ];
+          if( $value != '' ) {
+            $html .= '<dt>' . ucfirst( $this -> fieldNames[ $bibField ] ) . '</dt><dd>' . $value . '</dd>';
+          }
         }
       }
     }
@@ -398,14 +405,18 @@
         $html .= '<label for="' . $this -> toParamName( $bibField  ) . '">' .
           ucfirst( $this -> fieldNames[ $bibField ] ) . '</label><br />' ;
         $html .= '<small>' . $this -> fieldDescs[ $bibField ] . '</small><br />';
+        $value = '';
+        if( array_key_exists( $bibField, $obj ) ) {
+          $value = $obj[ $bibField ];
+        }
         switch( $this -> fieldOptions[ $bibField ][ 'type' ] ) {
           case 'string':
-            $html .= '<input name="' . $this -> toParamName( $bibField ) . '" type="text" value="' . $obj[ $bibField ] .
+            $html .= '<input name="' . $this -> toParamName( $bibField ) . '" type="text" value="' . $value .
               '" size="' . $this -> fieldOptions[ $bibField ][ 'size' ] . '"></input><br /><br />' ;
             break;
           case 'text':
             $html .= '<textarea name="' . $this -> toParamName( $bibField ) . '" cols="' . $this -> fieldOptions[ $bibField ][ 'cols' ] .
-              '"' . ' rows="' . $this -> fieldOptions[ $bibField ][ 'rows' ] . '">' . $obj[ $bibField ] . '</textarea><br /><br />' ;
+              '"' . ' rows="' . $this -> fieldOptions[ $bibField ][ 'rows' ] . '">' . $value . '</textarea><br /><br />' ;
             break;
         }
       }
@@ -471,11 +482,31 @@
     foreach( $collection as $obj ) {
       $html .= '<tr>';
       $html .= '<td>' . $this -> linkTo( '&gt;&gt;', $this -> showPath( $obj[ $this -> idField ] ) ) . '</td>';
-      $html .= '<td>' . $obj['year'] . '</td>';
-      $html .= '<td>' . $obj['title'] . '</td>';
-      $html .= '<td>' . $obj['author'] . '</td>';
-      $html .= '<td>' . $obj['publisher'] . '</td>';
-      $html .= '<td>' . $obj['journal'] . '</td>';
+      if( array_key_exists( 'year', $obj ) ) {
+        $html .= '<td>' . $obj['year'] . '</td>';
+      } else {
+        $html .= '<td></td>';
+      }
+      if( array_key_exists( 'title', $obj ) ) {
+        $html .= '<td>' . $obj['title'] . '</td>';
+      } else {
+        $html .= '<td></td>';
+      }
+      if( array_key_exists( 'author', $obj ) ) {
+        $html .= '<td>' . $obj['author'] . '</td>';
+      } else {
+        $html .= '<td></td>';
+      }
+      if( array_key_exists( 'publisher', $obj ) ) {
+        $html .= '<td>' . $obj['publisher'] . '</td>';
+      } else {
+        $html .= '<td></td>';
+      }
+      if( array_key_exists( 'journal', $obj ) ) {
+        $html .= '<td>' . $obj['journal'] . '</td>';
+      } else {
+        $html .= '<td></td>';
+      }
       $html .= '</tr>';
     }
     $html .= '</table>';

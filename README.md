@@ -20,6 +20,11 @@ In your `LocalSettings.php` add the following line:
 
     require_once( "$IP/extensions/BibWiki/BibWiki.php" );
 
+To enable pdf file uploads:
+
+    $wgEnableUploads=true;
+    $wgFileExtensions[]='pdf';
+
 Configuration
 -------------
 Default settings can be changed in `LocalSettings.php`.
