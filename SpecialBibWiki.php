@@ -409,9 +409,9 @@
   }
 
   function getSearchForm( $criteria ) {
-    global $wgBibWikiPathPrefix;
+    global $wgScriptPath;
     $html = '<br />';
-    $html .= '<form class="bibwiki-search" action="' . $wgBibWikiPathPrefix . '/' . $this -> searchPath . '" method="get">';
+    $html .= '<form class="bibwiki-search" action="' . $wgScriptPath . '/' . $this -> searchPath . '" method="get">';
     foreach( $this -> searcheableFields as $field ) {
       $html .= '<label for="' . $this -> toParamName( $field ) . '">' . ucfirst($this -> fieldNames[$field]) . '</label>';
       $html .= '<input name="' . $this -> toParamName( $field ) . '" type="text" size="40" ';

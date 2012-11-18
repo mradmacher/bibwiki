@@ -8,7 +8,7 @@ $wgExtensionCredits[ 'specialpage' ][] = array(
   'author' => 'Michał Radmacher',
   'url' => 'http://radmacher.pl',
   'descriptionmsg' => 'BibWiki',
-  'version' => '0.0.1'
+  'version' => '1.0.0'
 );
 
 $dir = dirname( __FILE__ ) . '/';
@@ -39,5 +39,4 @@ $wgSpecialPageGroups[ 'BibWikiEdit' ] = 'bibwiki';
 $wgSpecialPageGroups[ 'BibWikiAdmin' ] = 'bibwiki';
 
 $wgBibWikiTmpDir = '/tmp';
-$wgBibWikiPathPrefix = '/wiki';
 ?>

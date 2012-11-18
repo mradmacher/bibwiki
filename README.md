@@ -66,7 +66,6 @@ Currently there are following configuration options available:
 
 * `$wgBibWikiTmpDir` (defaults to "/tmp") - the name of the directory that can be used for storing temporary data;
   it should be readable and writeable for the web server
-* `$wgBibWikiPathPrefix` (defaults to "/wiki") - the prefix that should be prepended to names of the special pages
 
 Usage
 -----
