@@ -1,2 +1,2 @@
-%%FOR%% (dec: title) { "entry_type": "%%$bibtype%%", "bibkey": "%%$bibkey%%" %%BIB%% (inc: dupa;) G=",\"%%name%%\": \"%%content%%\""%%BIB%% }
+%%FOR%% (dec: title) { "entrytype": "%%$bibtype%%", "bibkey": "%%$bibkey%%" %%BIB%% (inc: dupa;) G=",\"%%name%%\": \"%%content%%\""%%BIB%% }
 %%ROF%%

@@ -3,17 +3,15 @@ $messages = array();
 
 $messages['en'] = array(
   'specialpages-group-bibwiki' => 'Bibliography',
-  'bibwikiindex' => 'Listing publications',
-  'bibwikiindex-desc' => 'Bibliography searching',
-  'bibwikimodify' => 'Modifying publication',
-  'bibwikimodify-desc' => 'Publication modifying',
-  'bibwikinew' => 'Creating publication',
-  'bibwikinew-desc' => 'Publication creating',
-  'bibwikiimport' => 'Importing publications',
-  'bibwikiimport-desc' => 'Bibliography importing',
-  'bibwikishow' => 'Showing publication',
-  'bibwikishow-desc' => 'Publication viewing',
-  'bibwikidelete' => 'Deleting publication',
-  'bibwikidelete-desc' => 'Publication deleting'
+  'bibwikisearch' => 'Search publications',
+  'bibwikisearch-desc' => 'Publications searching',
+  'bibwikiedit' => 'Edit publication',
+  'bibwikiedit-desc' => 'Publication editing',
+  'bibwikicreate' => 'Create publication',
+  'bibwikicreate-desc' => 'Publication creating',
+  'bibwikiimport' => 'Import publications',
+  'bibwikiimport-desc' => 'Publication importing',
+  'bibwikiadmin' => 'Administrate BibWiki',
+  'bibwikiadmin-desc' => 'BibWiki Administration'
 );
 ?>

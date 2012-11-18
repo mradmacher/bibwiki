@@ -8,12 +8,12 @@
     global $wgRequest, $wgOut, $wgBibWikiTmpDir;
     parent::execute( $par );
 
+    $wgOut -> addWikiText( $this -> linkToMainCategory() );
     $curdir = dirname( __FILE__ );
     //$upldir = '/tmp';
 
-    $wgOut -> addHtml( $this -> linkTo( 'Index', $this -> indexPath() ) );
     if( $wgRequest -> wasPosted() ) {
-      $wgOut -> addHtml( $this -> linkTo( 'Import', $this -> importPath() ) );
+      $wgOut -> addWikiText( $this -> linkToSearch() . ' ' . $this -> linkToImport() );
       $file = tempnam( $wgBibWikiTmpDir, 'bib' );
       $fh = fopen( $file, 'w' ) or die( "can't open file" );
       fwrite( $fh, $wgRequest -> getVal( 'pub_bib' ) );
@@ -22,23 +22,21 @@
       $wgOut -> addWikiText( exec( 'bib2x -f ' . $file . ' -t ' . $curdir . '/import.template', $result ) );
       $publications = array();
       $duplicates_count = 0;
+      $importedCount = 0;
       foreach( $result as $line ) {
         if( $line != '' ) {
           $pub = json_decode( $line, true ); 
-          $type = str_replace( '@', '', $pub['entry_type'] );
-          $pub[ $this -> typeField ] = $type;
-          $key = $this -> genBibkey( $pub );
-          $pub[ $this -> bibkeyField ] = $key;
-          if( $this -> isUnique( $key ) ) {
-            array_push( $publications, $pub );
-          } else {
-            $duplicates_count += 1;
+          $obj[self::TYPE] = $this -> tex2wikiTypes[$pub[$this -> tex2wikiTypeField]];
+          foreach( $this -> tex2wikiFields as $key => $field ) {
+            if( array_key_exists( $key, $pub ) ) {
+              $obj[$field] = $pub[$key];
+            }
           }
+          $this -> savePage( $this -> genTitle( $obj ), $this -> genTemplate( $obj ) );
+          $importedCount += 1;
         }
       }
-      $this -> import( $publications );
-      $wgOut -> addWikiText( 'Imported: ' . count($publications) );
-      $wgOut -> addWikiText( 'Already existing: ' . $duplicates_count );
+      $wgOut -> addWikiText( 'Imported: ' . $importedCount );
     } else {
       $html = '';
       $html .= '<form action="" method="post">';

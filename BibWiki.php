@@ -13,33 +13,31 @@ $wgExtensionCredits[ 'specialpage' ][] = array(
 
 $dir = dirname( __FILE__ ) . '/';
 $wgAutoloadClasses[ 'SpecialBibWiki' ] = $dir . 'SpecialBibWiki.php';
-$wgAutoloadClasses[ 'SpecialBibWikiIndex' ] = $dir . 'SpecialBibWikiIndex.php';
-$wgAutoloadClasses[ 'SpecialBibWikiShow' ] = $dir . 'SpecialBibWikiShow.php';
-$wgAutoloadClasses[ 'SpecialBibWikiDelete' ] = $dir . 'SpecialBibWikiDelete.php';
+$wgAutoloadClasses[ 'SpecialBibWikiSearch' ] = $dir . 'SpecialBibWikiSearch.php';
 $wgAutoloadClasses[ 'SpecialBibWikiImport' ] = $dir . 'SpecialBibWikiImport.php';
-$wgAutoloadClasses[ 'SpecialBibWikiNew' ] = $dir . 'SpecialBibWikiNew.php';
-$wgAutoloadClasses[ 'SpecialBibWikiModify' ] = $dir . 'SpecialBibWikiModify.php';
+$wgAutoloadClasses[ 'SpecialBibWikiCreate' ] = $dir . 'SpecialBibWikiCreate.php';
+$wgAutoloadClasses[ 'SpecialBibWikiEdit' ] = $dir . 'SpecialBibWikiEdit.php';
+$wgAutoloadClasses[ 'SpecialBibWikiAdmin' ] = $dir . 'SpecialBibWikiAdmin.php';
 
-$wgExtensionMessagesFiles[ 'BibWikiIndex' ] = $dir . 'BibWiki.i18n.php';
-$wgExtensionMessagesFiles[ 'BibWikiShow' ] = $dir . 'BibWiki.i18n.php';
-$wgExtensionMessagesFiles[ 'BibWikiDelete' ] = $dir . 'BibWiki.i18n.php';
+$wgExtensionMessagesFiles[ 'BibWikiSearch' ] = $dir . 'BibWiki.i18n.php';
 $wgExtensionMessagesFiles[ 'BibWikiImport' ] = $dir . 'BibWiki.i18n.php';
-$wgExtensionMessagesFiles[ 'BibWikiNew' ] = $dir . 'BibWiki.i18n.php';
-$wgExtensionMessagesFiles[ 'BibWikiModify' ] = $dir . 'BibWiki.i18n.php';
+$wgExtensionMessagesFiles[ 'BibWikiCreate' ] = $dir . 'BibWiki.i18n.php';
+$wgExtensionMessagesFiles[ 'BibWikiEdit' ] = $dir . 'BibWiki.i18n.php';
+$wgExtensionMessagesFiles[ 'BibWikiAdmin' ] = $dir . 'BibWiki.i18n.php';
 
-$wgSpecialPages[ 'BibWikiIndex' ] = 'SpecialBibWikiIndex';
-$wgSpecialPages[ 'BibWikiShow' ] = 'SpecialBibWikiShow';
+$wgSpecialPages[ 'BibWikiSearch' ] = 'SpecialBibWikiSearch';
 $wgSpecialPages[ 'BibWikiImport' ] = 'SpecialBibWikiImport';
-$wgSpecialPages[ 'BibWikiDelete' ] = 'SpecialBibWikiDelete';
-$wgSpecialPages[ 'BibWikiNew' ] = 'SpecialBibWikiNew';
-$wgSpecialPages[ 'BibWikiModify' ] = 'SpecialBibWikiModify';
+$wgSpecialPages[ 'BibWikiCreate' ] = 'SpecialBibWikiCreate';
+$wgSpecialPages[ 'BibWikiEdit' ] = 'SpecialBibWikiEdit';
+$wgSpecialPages[ 'BibWikiAdmin' ] = 'SpecialBibWikiAdmin';
 
 $wgSpecialPageGroups[ 'BibWiki' ] = 'bibwiki';
 $wgSpecialPageGroups[ 'BibWikiImport' ] = 'bibwiki';
-$wgSpecialPageGroups[ 'BibWikiIndex' ] = 'bibwiki';
-$wgSpecialPageGroups[ 'BibWikiNew' ] = 'bibwiki';
+$wgSpecialPageGroups[ 'BibWikiSearch' ] = 'bibwiki';
+$wgSpecialPageGroups[ 'BibWikiCreate' ] = 'bibwiki';
+$wgSpecialPageGroups[ 'BibWikiEdit' ] = 'bibwiki';
+$wgSpecialPageGroups[ 'BibWikiAdmin' ] = 'bibwiki';
 
 $wgBibWikiTmpDir = '/tmp';
-$wgBibWikiDBName = 'bibwiki';
 $wgBibWikiPathPrefix = '/wiki';
 ?>
