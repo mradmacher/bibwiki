@@ -27,7 +27,7 @@ To enable pdf file uploads:
     $wgFileExtensions[]='pdf';
 
 Go to `Special:BibWikiAdmin` to install required categories and properties.
-The following entities will be created or overvritten by instalation script:
+The following entities will be created or overwritten by instalation script:
 
 * `Category:Publication`
 * `Template:Publication`
@@ -70,6 +70,14 @@ Currently there are following configuration options available:
 Usage
 -----
 After installation the extension will be available in Special Pages section of MediaWiki.
+Publications will be added to the Main namespace under the title built with vaules based on the publication's properties:
+
+* `Author` - last name of the first author
+* `year` - year, missing numbers replaced by x
+* `Type` - type of the publication
+* `TITLE` - created from the title
+
+Author-year-Type-TITLE
 
 Attributions
 ------------
