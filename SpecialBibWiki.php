@@ -19,11 +19,11 @@
   const ID = 'id';
 
   const ADDRESS = 'address';
-  const ANNOTE = 'annote';
   const AUTHOR = 'author';
   const BOOKTITLE = 'booktitle';
   const CHAPTER = 'chapter';
   const CROSSREF = 'crossref';
+  const DOI = 'doi';
   const EDITION = 'edition';
   const EDITOR = 'editor';
   const EPRINT = 'eprint';
@@ -84,7 +84,7 @@
     self::TYPEDESC,
     self::CROSSREF,
     self::URL,
-//    self::ANNOTE,
+    self::DOI,
     self::KEYWORDS
     );
 
@@ -113,7 +113,7 @@
     'type'          => self::TYPEDESC,
     'crossref'      => self::CROSSREF,
     'url'           => self::URL,
-    'annote'        => self::ANNOTE,
+    'doi'           => self::DOI,
     'keywords'      => self::KEYWORDS
     );
 
@@ -136,11 +136,11 @@
 
   protected $fieldTypes = array(
     self::ADDRESS => 'string',
-    self::ANNOTE => 'text',
     self::AUTHOR => 'string',
     self::BOOKTITLE => 'string',
     self::CHAPTER => 'string',
     self::CROSSREF => 'page',
+    self::DOI => 'URL',
     self::EDITION => 'string',
     self::EDITOR => 'string',
     self::EPRINT => 'string',
@@ -164,7 +164,7 @@
 
   protected $fieldNames = array(
     self::ADDRESS => 'Address',
-    self::ANNOTE => 'Annotation',
+    self::DOI => 'DOI',
     self::AUTHOR => 'Author',
     self::BOOKTITLE => 'Book Title',
     self::CHAPTER => 'Chapter',
@@ -192,11 +192,11 @@
 
   protected $fieldDescs = array(
     self::ADDRESS => 'Publisher\'s address (usually just the city, but can be the full address for lesser-known publishers)',
-    self::ANNOTE => 'An annotation for annotated bibliography styles (not typical)',
     self::AUTHOR => 'The name(s) of the author(s) (in the case of more than one author, separated by and)',
     self::BOOKTITLE => 'The title of the book, if only part of it is being cited',
     self::CHAPTER => 'The chapter number',
     self::CROSSREF => 'The key of the cross-referenced entry',
+    self::DOI => 'DOI name from dx.doi.org',
     self::EDITION => 'The edition of a book, long form (such as "first" or "second")',
     self::EDITOR => 'The name(s) of the editor(s)',
     self::EPRINT => 'A specification of an electronic publication, often a preprint or a technical report',
@@ -256,65 +256,65 @@
   protected $entryTypeFields = array(
     self::TYPE_ARTICLE => array( 
         'required' => array( self::AUTHOR, self::TITLE, self::JOURNAL, self::YEAR ),
-        'optional' => array( self::VOLUME, self::NUMBER, self::PAGES, self::MONTH, self::NOTE, self::KEYWORDS ) 
+        'optional' => array( self::VOLUME, self::NUMBER, self::PAGES, self::MONTH, self::NOTE, self::DOI, self::KEYWORDS ) 
         ),
     self::TYPE_BOOK => array( 
         'required' => array( self::AUTHOR, self::EDITOR, self::TITLE, self::PUBLISHER, self::YEAR ),
-        'optional' => array( self::VOLUME, self::NUMBER, self::SERIES, self::ADDRESS, self::EDITION, self::MONTH, self::NOTE, self::KEYWORDS ) 
+        'optional' => array( self::VOLUME, self::NUMBER, self::SERIES, self::ADDRESS, self::EDITION, self::MONTH, self::NOTE, self::DOI, self::KEYWORDS ) 
         ),
     self::TYPE_BOOKLET => array( 
         'required' => array( self::TITLE ),
-        'optional' => array( self::AUTHOR, self::HOWPUBLISHED, self::ADDRESS, self::MONTH, self::YEAR, self::NOTE, self::KEYWORDS ) 
+        'optional' => array( self::AUTHOR, self::HOWPUBLISHED, self::ADDRESS, self::MONTH, self::YEAR, self::NOTE, self::DOI, self::KEYWORDS ) 
         ),
     self::TYPE_INBOOK => array( 
         'required' => array( self::AUTHOR, self::EDITOR, self::TITLE, self::CHAPTER, self::PAGES, self::PUBLISHER, self::YEAR ),
-        'optional' => array( self::VOLUME, self::NUMBER, self::SERIES, self::TYPEDESC, self::ADDRESS, self::EDITION, self::MONTH, self::NOTE, self::KEYWORDS ) 
+        'optional' => array( self::VOLUME, self::NUMBER, self::SERIES, self::TYPEDESC, self::ADDRESS, self::EDITION, self::MONTH, self::NOTE, self::DOI, self::KEYWORDS ) 
         ),
     self::TYPE_INCOLLECTION => array( 
         'required' => array( self::AUTHOR, self::TITLE, self::BOOKTITLE, self::PUBLISHER, self::YEAR ),
-        'optional' => array( self::EDITOR, self::VOLUME, self::NUMBER, self::SERIES, self::TYPEDESC, self::CHAPTER, self::PAGES, self::ADDRESS, self::EDITION, self::MONTH, self::NOTE, self::KEYWORDS )
+        'optional' => array( self::EDITOR, self::VOLUME, self::NUMBER, self::SERIES, self::TYPEDESC, self::CHAPTER, self::PAGES, self::ADDRESS, self::EDITION, self::MONTH, self::NOTE, self::DOI, self::KEYWORDS )
         ),
     self::TYPE_INPROCEEDINGS => array( 
         'required' => array( self::AUTHOR, self::TITLE, self::BOOKTITLE, self::YEAR ),
-        'optional' => array( self::EDITOR, self::VOLUME, self::NUMBER, self::SERIES, self::PAGES, self::ADDRESS, self::MONTH, self::ORGANIZATION, self::PUBLISHER, self::NOTE, self::KEYWORDS ) 
+        'optional' => array( self::EDITOR, self::VOLUME, self::NUMBER, self::SERIES, self::PAGES, self::ADDRESS, self::MONTH, self::ORGANIZATION, self::PUBLISHER, self::NOTE, self::DOI, self::KEYWORDS ) 
         ),
     self::TYPE_MANUAL => array(
         'required' => array( self::TITLE ),
-        'optional' => array( self::AUTHOR, self::ORGANIZATION, self::ADDRESS, self::EDITION, self::MONTH, self::YEAR, self::NOTE, self::KEYWORDS )
+        'optional' => array( self::AUTHOR, self::ORGANIZATION, self::ADDRESS, self::EDITION, self::MONTH, self::YEAR, self::NOTE, self::DOI, self::KEYWORDS )
         ),
     self::TYPE_MASTERSTHESIS => array(
         'required' => array( self::AUTHOR, self::TITLE, self::SCHOOL, self::YEAR ),
-        'optional' => array( self::TYPEDESC, self::ADDRESS, self::MONTH, self::NOTE, self::KEYWORDS ),
+        'optional' => array( self::TYPEDESC, self::ADDRESS, self::MONTH, self::NOTE, self::DOI, self::KEYWORDS ),
         ),
     self::TYPE_MISC => array(
         'required' => array(),
-        'optional' => array( self::AUTHOR, self::TITLE, self::HOWPUBLISHED, self::MONTH, self::YEAR, self::NOTE, self::KEYWORDS )
+        'optional' => array( self::AUTHOR, self::TITLE, self::HOWPUBLISHED, self::MONTH, self::YEAR, self::NOTE, self::DOI, self::KEYWORDS )
         ),
     self::TYPE_PHDTHESIS => array(
         'required' => array( self::AUTHOR, self::TITLE, self::SCHOOL, self::YEAR ),
-        'optional' => array( self::TYPEDESC, self::ADDRESS, self::MONTH, self::NOTE, self::KEYWORDS )
+        'optional' => array( self::TYPEDESC, self::ADDRESS, self::MONTH, self::NOTE, self::DOI, self::KEYWORDS )
         ),
     self::TYPE_PROCEEDINGS => array(
         'required' => array( self::TITLE, self::YEAR ),
-        'optional' => array( self::EDITOR, self::VOLUME, self::NUMBER, self::SERIES, self::ADDRESS, self::MONTH, self::PUBLISHER, self::ORGANIZATION, self::NOTE, self::KEYWORDS )
+        'optional' => array( self::EDITOR, self::VOLUME, self::NUMBER, self::SERIES, self::ADDRESS, self::MONTH, self::PUBLISHER, self::ORGANIZATION, self::NOTE, self::DOI, self::KEYWORDS )
         ),
     self::TYPE_TECHREPORT => array(
         'required' => array( self::AUTHOR, self::TITLE, self::INSTITUTION, self::YEAR ),
-        'optional' => array( self::TYPEDESC, self::NUMBER, self::ADDRESS, self::MONTH, self::NOTE, self::KEYWORDS )
+        'optional' => array( self::TYPEDESC, self::NUMBER, self::ADDRESS, self::MONTH, self::NOTE, self::DOI, self::KEYWORDS )
         ),
     self::TYPE_UNPUBLISHED => array(
         'required' => array( self::AUTHOR, self::TITLE, self::NOTE ),
-        'optional' => array( self::MONTH, self::YEAR, self::KEYWORDS )
+        'optional' => array( self::MONTH, self::YEAR, self::DOI, self::KEYWORDS )
         )
     );
 
   protected $fieldOptions = array(
       self::ADDRESS => array( 'type' => 'string', 'size' => 80 ),
-      self::ANNOTE => array( 'type' => 'text', 'cols' => 60, 'rows' => 20 ),
       self::AUTHOR => array( 'type' => 'string', 'size' => 80 ),
       self::BOOKTITLE => array( 'type' => 'string', 'size' => 80 ),
       self::CHAPTER => array( 'type' => 'string', 'size' => 80 ),
       self::CROSSREF => array( 'type' => 'string', 'size' => 80 ),
+      self::DOI => array( 'type' => 'string', 'size' => 80 ),
       self::EDITION => array( 'type' => 'string', 'size' => 80 ),
       self::EDITOR => array( 'type' => 'string', 'size' => 80 ),
       self::EPRINT => array( 'type' => 'string', 'size' => 80 ),
