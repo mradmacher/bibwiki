@@ -13,9 +13,15 @@
     $wgOut -> addWikiText( $this -> linkToMainCategory() );
     if( $wgRequest -> wasPosted() ) {
       $obj = $this -> parseParams( $wgRequest );
-      $this -> savePage( $this -> genTitle( $obj ), $this -> genTemplate( $obj ) );
-      $wgOut -> addWikiText( $this -> linkToSearch() . ' ' . $this -> linkToCreate() . ' ' . $this -> linkToShow( $this -> genID( $obj ) ) );
-      $wgOut -> addWikiText( 'Publication successfully saved.' );
+      $id = $this -> genID( $obj );
+      $obj[self::ID] = $id;
+      if( $this -> publicationExists( $id ) ) {
+        $wgOut -> addWikiText( 'Publication can not be saved. Publication with similar data already exists.' );
+      } else {
+        $this -> savePublication( $obj );
+        $wgOut -> addWikiText( 'Publication successfully saved.' );
+      }
+      $wgOut -> addWikiText( $this -> linkToSearch() . ' ' . $this -> linkToCreate() . ' ' . $this -> linkToShow( $obj[self::ID] ) );
     } else {
       $wgOut -> addWikiText( $this -> linkToSearch() . ' ' . $this -> linkToCreate() );
       if( $par != '' ) {

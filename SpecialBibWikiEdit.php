@@ -12,17 +12,27 @@
 
     if( $wgRequest -> wasPosted() ) {
       $obj = $this -> parseParams( $wgRequest );
+      $newid = $this -> genID( $obj );
+      $canBeSaved = true;
+      if( $obj[self::ID] != $newid ) {
+        if( $this -> publicationExists( $newid ) ) {
+          $wgOut -> addWikiText( 'Publication can not be saved. Publication with similar data already exists.' );
+          $canBeSaved = false;
+        } else {
+          $this -> changePublicationID( $obj[self::ID], $newid );
+          $this -> changePublicationFileID( $obj[self::ID], $newid );
+          $obj[self::ID] = $newid;
+        }
+      } 
+      if( $canBeSaved ) {
+        $this -> savePublication( $obj );
+        $wgOut -> addWikiText( 'Publication successfully saved.' );
+      }
       $wgOut -> addWikiText( $this -> linkToSearch() . ' ' .
         $this -> linkToCreate() . ' ' . $this -> linkToShow( $obj[self::ID] ) );
-      //$newid = $this -> genID( $obj );
-      //if( $obj[self::ID] != $newid ) {
-      //  $wgOut -> addWikiText( 'Publication can not be saved.' );
-      //} else {
-        $this -> savePage( $this -> genTitle( $obj ), $this -> genTemplate( $obj ) );
-        $wgOut -> addWikiText( 'Publication successfully saved.' );
-      //}
     } else {
-      $obj = $this -> fetchPage( $par );
+      $obj = $this -> fetchPublication( $par );
+
       $wgOut -> addWikiText( $this -> linkToSearch() . ' ' .
         $this -> linkToCreate() . ' ' . $this -> linkToShow( $obj[self::ID] ) );
       $wgOut -> addHtml( $this -> getModifyHtml( $obj ) );

@@ -8,6 +8,7 @@
     global $wgRequest, $wgOut, $wgUser;
     parent::execute( $par );
 
+    $wgOut -> addWikiText( $this -> linkToMainCategory() );
     $wgOut -> addHtml ( '<form action="" method="post"><input type="submit" value="Install Properties and Templates" /></form>' );
   
     if( $wgRequest -> wasPosted() ) {

@@ -32,7 +32,9 @@
               $obj[$field] = $pub[$key];
             }
           }
-          $this -> savePage( $this -> genTitle( $obj ), $this -> genTemplate( $obj ) );
+          $id = $this -> genId( $obj );
+          $obj[self::ID] = $id;
+          $this -> savePublication( $obj );
           $importedCount += 1;
         }
       }

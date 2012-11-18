@@ -550,7 +550,7 @@
     $result = '{{' . self::TEMPLATE_NAME;
 
     $result .= '|' . self::TYPE . '=' . $obj[self::TYPE];
-    $result .= '|' . self::ID . '=' . $this -> genID( $obj );
+    $result .= '|' . self::ID . '=' . $obj[self::ID];
     foreach( $this -> fields as $field ) {
       if( array_key_exists( $field, $obj ) ) {
         $result .= '|' . $field . '=' . $obj[$field];
@@ -563,15 +563,44 @@
   }
 
   protected function genTitle( $obj ) {
-    return $this -> genID( $obj );
+    return $obj[self::ID];
   }
 
-  function fetchPage( $title ) {
+  function savePublication( $obj ) {
+    $title = $this -> genTitle( $obj );
+    $text = $this -> genTemplate( $obj );
+    $this -> savePage( $title, $text );
+  }
+
+  function publicationExists( $id ) {
+    $titleObject = Title::newFromText( $id );
+    return $titleObject -> exists();
+  }
+  function publicationFileExists( $id ) {
+    $titleObject = Title::newFromText( 'File:' . $id  . '.pdf' );
+    return $titleObject -> exists();
+  }
+
+  function changePublicationID( $oldID, $newID ) {
+    $oldTitle = $oldID;
+    $newTitle = $newID;
+    $this -> movePage( $oldTitle, $newTitle );
+  }
+
+  function changePublicationFileID( $oldID, $newID ) {
+    $oldTitle = 'File:' . $oldID . '.pdf';
+    $newTitle = 'File:'. $newID . '.pdf';
+    if( $this -> publicationFileExists( $oldID ) ) {
+      $this -> movePage( $oldTitle, $newTitle );
+    }
+  }
+
+  function fetchPublication( $id ) {
     global $wgRequest;
     $api = new ApiMain( new DerivativeRequest( $wgRequest,
         array(
           'action' => 'query',
-          'titles' =>  $title,
+          'titles' =>  $id,
           'prop' => 'revisions',
           'rvprop' => 'content',
           'format' => 'xml'),
@@ -599,6 +628,21 @@
           'action' => 'edit',
           'title' =>  $title,
           'text' => $text,
+          'token' => $token),
+        true),
+        true );
+    $api -> execute();
+  }
+
+  function movePage( $from, $to ) {
+    global $wgRequest, $wgUser;
+
+    $token = $wgUser -> editToken();
+    $api = new ApiMain( new DerivativeRequest( $wgRequest,
+        array(
+          'action' => 'move',
+          'from' =>  $from,
+          'to' => $to,
           'token' => $token),
         true),
         true );
