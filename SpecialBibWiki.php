@@ -518,17 +518,17 @@
     $test = preg_replace( '/ and.*$/', '', $author );
 
     $name = NULL;
-    preg_match( '/(\w+)}/U', $test, $matches );
+    preg_match( '/([^[:blank:]]+)}/U', $test, $matches );
     if( count($matches) > 0 ) {
       $name = $matches[1];
     }
     if( $name == NULL ) {
-      preg_match( '/(\w+),/U', $test, $matches );
+      preg_match( '/([^[:blank:]]+),/U', $test, $matches );
       if( count($matches) > 0 ) {
         $name = $matches[1];
       }
       if( $name == NULL ) {
-        preg_match( '/(\w+)$/', $test, $matches );
+        preg_match( '/([^[:blank:]]+)$/', $test, $matches );
         if( count($matches) > 0 ) {
           $name = $matches[1];
         }
