@@ -21,9 +21,11 @@
         $this -> savePublication( $obj );
         $wgOut -> addWikiText( 'Publication successfully saved.' );
       }
-      $wgOut -> addWikiText( $this -> linkToSearch() . ' ' . $this -> linkToCreate() . ' ' . $this -> linkToShow( $obj[self::ID] ) );
+      $wgOut -> addWikiText( $this -> linkToSearch() . ' ' . $this -> linkToImport() . ' ' . $this -> linkToCreate() . ' ' .
+        $this -> linkToShow( $obj[self::ID] ) );
     } else {
-      $wgOut -> addWikiText( $this -> linkToSearch() . ' ' . $this -> linkToCreate() );
+      $wgOut -> addWikiText( $this -> linkToSearch() . ' ' . $this -> linkToImport() . ' ' . $this -> linkToCreate() );
+          
       if( $par != '' ) {
         $obj[self::TYPE] = $par;
         $wgOut -> addHtml( $this -> getNewHtml( $obj, $par ) );

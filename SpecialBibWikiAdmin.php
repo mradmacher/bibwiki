@@ -55,6 +55,7 @@
       $text .= "}}\n\n";
       */
       $text .= $this -> linkToSearch() . ' ' .
+        $this -> linkToImport() . ' ' .
         $this -> linkToCreate() . ' ' .
         $this -> linkToEdit( '{{{' . self::ID . '}}}' );
 

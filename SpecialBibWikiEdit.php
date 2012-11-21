@@ -28,12 +28,12 @@
         $this -> savePublication( $obj );
         $wgOut -> addWikiText( 'Publication successfully saved.' );
       }
-      $wgOut -> addWikiText( $this -> linkToSearch() . ' ' .
+      $wgOut -> addWikiText( $this -> linkToSearch() . ' ' . $this -> linkToImport() . ' ' .
         $this -> linkToCreate() . ' ' . $this -> linkToShow( $obj[self::ID] ) );
     } else {
       $obj = $this -> fetchPublication( $par );
 
-      $wgOut -> addWikiText( $this -> linkToSearch() . ' ' .
+      $wgOut -> addWikiText( $this -> linkToSearch() . ' ' . $this -> linkToImport() . ' ' .
         $this -> linkToCreate() . ' ' . $this -> linkToShow( $obj[self::ID] ) );
       $wgOut -> addHtml( $this -> getModifyHtml( $obj ) );
     }
