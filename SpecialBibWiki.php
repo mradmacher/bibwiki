@@ -498,7 +498,8 @@
   }
 
   protected function genTitleHash( $title ) {
-    preg_match_all( '/(\w)\w+/', $title, $matches );
+    $test = $this -> transliterate( $title );
+    preg_match_all( '/(\w)\w+/', $test, $matches );
     return strtoupper( join( $matches[1], '' ) );
   }
 
@@ -515,20 +516,21 @@
   }
 
   protected function genAuthorHash( $author ) {
-    $test = preg_replace( '/ and.*$/', '', $author );
+    $firstAuthor = preg_replace( '/ and.*$/', '', $author );
+    $test = $this -> transliterate( $firstAuthor );
 
     $name = NULL;
-    preg_match( '/([^[:blank:]]+)}/U', $test, $matches );
+    preg_match( '/(\w+)}/U', $test, $matches );
     if( count($matches) > 0 ) {
       $name = $matches[1];
     }
     if( $name == NULL ) {
-      preg_match( '/([^[:blank:]]+),/U', $test, $matches );
+      preg_match( '/(\w+),/U', $test, $matches );
       if( count($matches) > 0 ) {
         $name = $matches[1];
       }
       if( $name == NULL ) {
-        preg_match( '/([^[:blank:]]+)$/', $test, $matches );
+        preg_match( '/(\w+)$/', $test, $matches );
         if( count($matches) > 0 ) {
           $name = $matches[1];
         }
@@ -647,6 +649,10 @@
         true),
         true );
     $api -> execute();
+  }
+
+  function transliterate( $text ) {
+    return iconv( "UTF-8", "ASCII//TRANSLIT", $text );
   }
 
 }
