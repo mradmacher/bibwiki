@@ -31,11 +31,20 @@
       $wgOut -> addWikiText( $this -> linkToSearch() . ' ' . $this -> linkToImport() . ' ' .
         $this -> linkToCreate() . ' ' . $this -> linkToShow( $obj[self::ID] ) );
     } else {
-      $obj = $this -> fetchPublication( $par );
+      if( $par != '' ) {
+        $obj = $this -> fetchPublication( $par );
+      } else {
+        $obj = array();
+      }
 
-      $wgOut -> addWikiText( $this -> linkToSearch() . ' ' . $this -> linkToImport() . ' ' .
-        $this -> linkToCreate() . ' ' . $this -> linkToShow( $obj[self::ID] ) );
-      $wgOut -> addHtml( $this -> getModifyHtml( $obj ) );
+      if( array_key_exists( self::ID, $obj ) ) {
+        $wgOut -> addWikiText( $this -> linkToSearch() . ' ' . $this -> linkToImport() . ' ' .
+          $this -> linkToCreate() . ' ' . $this -> linkToShow( $obj[self::ID] ) );
+        $wgOut -> addHtml( $this -> getModifyHtml( $obj ) );
+      } else {
+        $wgOut -> addWikiText( $this -> linkToSearch() . ' ' . $this -> linkToImport() . ' ' .
+          $this -> linkToCreate() );
+      }
     }
 
   }
