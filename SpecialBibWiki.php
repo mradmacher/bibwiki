@@ -2,7 +2,6 @@
   protected $searchPath = 'Special:BibWikiSearch';
   protected $editPath = 'Special:BibWikiEdit';
   protected $createPath = 'Special:BibWikiCreate';
-  //private $deletePath = '/Special:BibWikiDelete';
   protected $importPath = 'Special:BibWikiImport';
   protected $adminPath = 'Special:BibWikiAdmin';
 
@@ -379,19 +378,6 @@
     return '[[' . $id . '|Show]]';
   }
 
-  protected function getCSS() {
-    $css = '';
-    $css .= 'form.bibwiki-search {display: inline; margin-right: 5px;}';
-    $css .= '.bibwiki-search input[type=submit]{width: 62px;}';
-    $css .= '.bibwiki-search label {display: inline-table; width: 70px; text-align: right; margin-right: 5px;}';
-    $css .= '.bibwiki-search input {margin-bottom: 1px;}';
-    $css .= '.bibwiki-search label:after {content: ":";}';
-    $css .= '.bibwiki-link {margin-right: 5px;}';
-    $css .= '.bibwiki-table {border-collapse: collapse; border 1px solid}';
-    $css .= '.bibwiki-table td {padding-right: 5px; text-align: left; vertical-align: top;}';
-    return $css;
-  }
-
   function execute( $par ) {
     global $wgRequest, $wgOut, $wgUser;
     $this -> setHeaders();
@@ -402,39 +388,30 @@
     if( $wgRequest -> getText( 'printable' ) == 'yes' ) {
       $this -> printable = true;
     }
-    $wgOut -> addInlineStyle( $this -> getCSS() );
   }
+
   function isPrintable() {
     return $this -> printable;
   }
 
   function getSearchForm( $criteria ) {
     global $wgScriptPath;
-    $html = '<br />';
-    $html .= '<form class="bibwiki-search" action="' . $wgScriptPath . '/' . $this -> searchPath . '" method="get">';
+    $html = '<form action="' . $wgScriptPath . '/' . $this -> searchPath . '" method="get">';
+    $html .= '<table>';
     foreach( $this -> searcheableFields as $field ) {
-      $html .= '<label for="' . $this -> toParamName( $field ) . '">' . ucfirst($this -> fieldNames[$field]) . '</label>';
-      $html .= '<input name="' . $this -> toParamName( $field ) . '" type="text" size="40" ';
+      $html .= '<tr><th style="text-align:right">';
+      $html .= '<label for="' . $this -> toParamName( $field ) . '">' . ucfirst($this -> fieldNames[$field]) . ':</label></th>';
+      $html .= '<td><input name="' . $this -> toParamName( $field ) . '" type="text" size="40" ';
       if( array_key_exists( $field, $criteria ) ) {
-        $html .= 'value="' . $criteria[ $field ] . '" /><br />';
+        $html .= 'value="' . $criteria[ $field ] . '" /></td>';
       } else {
-        $html .= 'value="" /><br />';
+        $html .= 'value="" /></td></tr>';
       }
     }
-    $html .= '<input type="submit" value="Search" />';
-    $html .= '</form>';
-    $html .= '<form class="bibwiki-search" action="" method="get">';
-    $html .= '<input type="submit" value="Reset" />';
-    $html .= '</form>';
-    return $html;
-  }
-
-  function getDestroyForm( $obj ) {
-    $html = '<form class="bibwiki-form" action="" method="post">';
-    $html .= '<input name="' . $this -> toParamName( $this -> idField ) . '" type="hidden" value="' .
-      $obj[ $this -> idField ] . '"></input>';
-    $html .= '<input type="submit" value="Delete" />';
-    $html .= '</form>';
+    $html .= '<tr><td style="text-align:right"><input type="submit" value="Search" /></form></td>';
+    $html .= '<td><form action="' . $wgScriptPath . '/' . $this -> searchPath . '" method="get">';
+    $html .= '<input type="submit" value="Reset" /></td></tr>';
+    $html .= '</table></form>';
     return $html;
   }
 
@@ -599,7 +576,7 @@
 
   function fetchPublication( $id ) {
     global $wgRequest;
-    $api = new ApiMain( new DerivativeRequest( $wgRequest,
+    $api = new ApiMain( new FauxRequest( 
         array(
           'action' => 'query',
           'titles' =>  $id,
@@ -625,7 +602,9 @@
     global $wgRequest, $wgUser;
 
     $token = $wgUser -> editToken();
-    $api = new ApiMain( new DerivativeRequest( $wgRequest,
+
+    $api = new ApiMain( 
+    $params = new MyDerivativeRequest( $wgRequest,
         array(
           'action' => 'edit',
           'title' =>  $title,
@@ -640,7 +619,7 @@
     global $wgRequest, $wgUser;
 
     $token = $wgUser -> editToken();
-    $api = new ApiMain( new DerivativeRequest( $wgRequest,
+    $api = new ApiMain( new MyDerivativeRequest( $wgRequest,
         array(
           'action' => 'move',
           'from' =>  $from,
@@ -655,5 +634,48 @@
     return iconv( "UTF-8", "ASCII//TRANSLIT", $text );
   }
 
+}
+
+//Copied from MediaWiki sources for use with older MediaWiki (before 1.19).
+//Should be replaced by MediaWiki's DerivativeRequest
+class MyDerivativeRequest extends FauxRequest {
+	private $base;
+
+	public function __construct( WebRequest $base, $data, $wasPosted = false ) {
+		$this->base = $base;
+		parent::__construct( $data, $wasPosted );
+	}
+
+	public function getCookie( $key, $prefix = null, $default = null ) {
+		return $this->base->getCookie( $key, $prefix, $default );
+	}
+
+	public function checkSessionCookie() {
+		return $this->base->checkSessionCookie();
+	}
+
+	public function getHeader( $name ) {
+		return $this->base->getHeader( $name );
+	}
+
+	public function getAllHeaders() {
+		return $this->base->getAllHeaders();
+	}
+
+	public function getSessionData( $key ) {
+		return $this->base->getSessionData( $key );
+	}
+
+	public function setSessionData( $key, $data ) {
+		$this->base->setSessionData( $key, $data );
+	}
+
+	public function getAcceptLang() {
+		return $this->base->getAcceptLang();
+	}
+
+	public function getIP() {
+		return $this->base->getIP();
+	}
 }
 ?>
