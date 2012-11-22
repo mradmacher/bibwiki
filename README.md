@@ -34,11 +34,11 @@ The following entities will be created or overwritten by instalation script:
 * `Template:Publication`
 * `Property:Publication type`
 * `Property:Publication address`
-* `Property:Publication annote`
 * `Property:Publication author`
 * `Property:Publication booktitle`
 * `Property:Publication chapter`
 * `Property:Publication crossref`
+* `Property:Publication doi`
 * `Property:Publication edition`
 * `Property:Publication editor`
 * `Property:Publication eprint`
