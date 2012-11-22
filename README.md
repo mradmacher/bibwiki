@@ -5,9 +5,10 @@ Bibliography management for MediaWiki
 
 Requirements
 ------------
-* MediaWiki (at least 1.20)
-* SemanticMediaWiki extension (at least 1.7.1)
-* ParserFunctions extension (at least 1.4.1)
+* MediaWiki
+* SemanticMediaWiki extension
+* ParserFunctions extension
+* PHP function `iconv`
 * [Bib2x](http://www.xandi.eu/bib2x/documentation.html)
 
 Installation
@@ -75,7 +76,7 @@ Publications will be added to the Main namespace under the title built with vaul
 * `Author` - last name of the first author
 * `year` - year, missing numbers replaced by x
 * `Type` - type of the publication
-* `TITLE` - created from the title
+* `TITLE` - hash created from the title
 
 Author-year-Type-TITLE
 
